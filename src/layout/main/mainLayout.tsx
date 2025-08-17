@@ -7,8 +7,10 @@ export default function MainLayout(props: any) {
             <Navbar />
             <div className="flex w-full h-full overflow-hidden">
                 <MySidebar />
-                <div className="w-full h-full overflow-auto scrollbar-none p-4 relative">
-                    {props.children}
+                <div className="w-full p-3 relative">
+                    <div className="bg-white rounded-md h-full overflow-auto scrollbar-none p-4 relative shadow-xl/30">
+                        {props.children}
+                    </div>
                 </div>
             </div>
         </div>

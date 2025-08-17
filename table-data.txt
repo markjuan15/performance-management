@@ -1,0 +1,166 @@
+from graphviz import Digraph
+
+# Create ERD using Graphviz
+erd = Digraph("PerformanceManagement_ERD", format="png")
+erd.attr(rankdir="LR", size="8")
+
+# Define tables and fields
+tables = {
+    "EmployeeProfile": ["EmployeeID (PK)", "Name", "Position", "Department", "ContactInfo"],
+    "JobDescription": ["JobID (PK)", "EmployeeID (FK)", "JobTitle", "Responsibilities", "Qualifications"],
+    "PerformanceRating": ["RatingID (PK)", "EmployeeID (FK)", "RatingPeriod", "CoreCompetenciesRating", "StaffRating", "FinalAccreditationRating", "AdjectivalRating"],
+    "IPCRF_Template": ["TemplateID (PK)", "EmployeeID (FK)", "TemplateDetails"],
+    "IPCRF_DevelopmentPlan": ["PlanID (PK)", "EmployeeID (FK)", "Year", "DevelopmentalPlan", "FollowThrough", "CompletionStatus"],
+    "PerformanceInterventions": ["InterventionID (PK)", "EmployeeID (FK)", "PerformanceCounseling", "DevelopmentPlanRef (FK)", "ResearchConductedRef (FK)", "InnovationProgramsRef (FK)", "Others"],
+    "PerformanceCounselingMentoring": ["CounselingID (PK)", "EmployeeID (FK)", "Year", "Details"],
+    "Education": ["EducationID (PK)", "EmployeeID (FK)", "CourseTitle", "Degree", "PeriodOfAttendance"],
+    "Scholarship": ["ScholarshipID (PK)", "EmployeeID (FK)", "ScholarshipName", "Details"],
+    "ResearchConducted": ["ResearchID (PK)", "EmployeeID (FK)", "Year", "ResearchTitle", "AreaOfGovernance", "ResearchPeriodFrom", "ResearchPeriodTo", "Results", "ImplementationPeriod"],
+    "InnovationPrograms": ["InnovationID (PK)", "EmployeeID (FK)", "Year", "Title", "AreaOfGovernance", "ImplementationFrom", "ImplementationTo", "ImplementationPeriod"],
+    "Mentoring": ["MentoringID (PK)", "EmployeeID (FK)", "Title", "Details"],
+    "Benchmarking": ["BenchmarkingID (PK)", "EmployeeID (FK)", "Title", "Details"]
+}
+
+# Add nodes for tables
+for table, fields in tables.items():
+    label = f"{table}|{{" + "|".join(fields) + "}}"
+    erd.node(table, label=label, shape="record")
+
+# Define relationships (FK -> PK)
+relationships = [
+    ("JobDescription", "EmployeeProfile"),
+    ("PerformanceRating", "EmployeeProfile"),
+    ("IPCRF_Template", "EmployeeProfile"),
+    ("IPCRF_DevelopmentPlan", "EmployeeProfile"),
+    ("PerformanceInterventions", "EmployeeProfile"),
+    ("PerformanceCounselingMentoring", "EmployeeProfile"),
+    ("Education", "EmployeeProfile"),
+    ("Scholarship", "EmployeeProfile"),
+    ("ResearchConducted", "EmployeeProfile"),
+    ("InnovationPrograms", "EmployeeProfile"),
+    ("Mentoring", "EmployeeProfile"),
+    ("Benchmarking", "EmployeeProfile"),
+    # Cross-references inside Interventions
+    ("PerformanceInterventions", "IPCRF_DevelopmentPlan"),
+    ("PerformanceInterventions", "ResearchConducted"),
+    ("PerformanceInterventions", "InnovationPrograms")
+]
+
+# Add edges
+for child, parent in relationships:
+    erd.edge(child, parent)
+
+# Render ERD to file
+erd_path = "/mnt/data/PerformanceManagement_ERD.png"
+erd.render(erd_path, cleanup=True)
+
+erd_path
+
+
+EmployeeProfile
+    EmployeeID (PK)
+    Name
+    Position
+    Department
+    ContactInfo
+    Address
+    Age
+    Sex
+    Status
+
+JobDescription
+    JobID (PK)
+    EmployeeID (FK)
+    JobTitle
+    JobResponsibilities
+    Qualifications
+
+Performance Ratings
+    PerformanceRating
+    RatingID (PK)
+    EmployeeID (FK)
+    RatingPeriod
+    CoreCompetenciesRating
+    StaffRating
+    FinalAccreditationRating
+    AdjectivalRating
+
+📌 IPCRF (Individual Performance Commitment and Review Form)
+
+IPCRF_Template
+    TemplateID (PK)
+    EmployeeID (FK)
+    TemplateDetails
+
+IPCRF_DevelopmentPlan
+    PlanID (PK)
+    EmployeeID (FK)
+    Year
+    DevelopmentalPlan
+    FollowThrough
+    CompletionStatus
+
+📌 Performance Interventions
+
+PerformanceInterventions
+    InterventionID (PK)
+    EmployeeID (FK)
+    PerformanceCounseling
+    DevelopmentPlanRef (FK)
+    ResearchConductedRef (FK)
+    InnovationProgramsRef (FK)
+    Others
+
+PerformanceCounselingMentoring
+    CounselingID (PK)
+    EmployeeID (FK)
+    Year
+    Details
+
+📌 Education, Training, & Scholarships
+Education
+    EducationID (PK)
+    EmployeeID (FK)
+    CourseTitle
+    Degree
+    PeriodOfAttendance
+    Scholarship
+    ScholarshipID (PK)
+    EmployeeID (FK)
+    ScholarshipName
+    Details
+
+📌 Research & Innovation
+ResearchConducted
+    ResearchID (PK)
+    EmployeeID (FK)
+    Year
+    ResearchTitle
+    AreaOfGovernance
+    ResearchPeriodFrom
+    ResearchPeriodTo
+    Results
+    ImplementationPeriod
+
+InnovationPrograms
+    InnovationID (PK)
+    EmployeeID (FK)
+    Year
+    Title
+    AreaOfGovernance
+    ImplementationFrom
+    ImplementationTo
+    ImplementationPeriod
+
+📌 Mentoring & Benchmarking
+Mentoring
+    MentoringID (PK)
+    EmployeeID (FK)
+    Title
+    Details
+
+Benchmarking
+    BenchmarkingID (PK)
+    EmployeeID (FK)
+    Title
+    Details

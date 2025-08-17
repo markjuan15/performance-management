@@ -1,4 +1,19 @@
+@font-face {
+    font-family: Bebas;
+    src: url("../src/assets/fonts/BebasNeue-Regular.ttf");
+}
+
+@font-face {
+    font-family: Montserrat;
+    src: url("../src/assets/fonts/Montserrat-VariableFont_wght.ttf");
+}
+
 @import "tailwindcss";
 @plugin 'tailwind-scrollbar';
 @plugin "flowbite-react/plugin/tailwindcss";
 @source "../.flowbite-react/class-list.json";
+
+@theme {
+    --font-bebas: Bebas, "sans-serif";
+    --font-montserrat: Montserrat, "sans-serif";
+}
