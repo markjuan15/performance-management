@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 

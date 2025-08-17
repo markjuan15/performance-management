@@ -13,13 +13,13 @@ export const Items = [
         label: "IPCRF",
         icon: <IoIosHome className="text-[.9rem]" />,
         items: [
-            { label: "Performance Rating Form", link: "/", index: 3.1 },
-            { label: "Template", link: "/", index: 3.2 },
-            { label: "Development Plan", link: "/", index: 3.3 },
+            { label: "Performance Rating Form", link: "/performance-rating-form", index: 3.1 },
+            { label: "Template", link: "/template", index: 3.2 },
+            { label: "Development Plan", link: "/development-plan", index: 3.3 },
         ]
     },
-    { type: "item", label: "Performance Rating", link: "/", icon: <FaStar className="text-[.9rem]" /> },
-    { type: "item", label: "Performance Interventions", link: "/", icon: <PiIntersect className="text-[.9rem]" /> },
-    { type: "item", label: "Coaching & Mentoring", link: "/", icon: <SiMentorcruise className="text-[.9rem]" /> },
-    { type: "item", label: "Others", link: "/", icon: <TbSquareAsteriskFilled className="text-[.9rem]" /> },
+    { type: "item", label: "Performance Rating", link: "/performance-rating", icon: <FaStar className="text-[.9rem]" /> },
+    { type: "item", label: "Performance Interventions", link: "/performance-interventions", icon: <PiIntersect className="text-[.9rem]" /> },
+    { type: "item", label: "Coaching & Mentoring", link: "/coaching-mentoring", icon: <SiMentorcruise className="text-[.9rem]" /> },
+    { type: "item", label: "Others", link: "/others", icon: <TbSquareAsteriskFilled className="text-[.9rem]" /> },
 ]
