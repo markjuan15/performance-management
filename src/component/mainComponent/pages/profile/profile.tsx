@@ -1,5 +1,6 @@
 import MainLayout from "../../../../layout/main/mainLayout";
 import { IoMdDownload, IoMdPrint } from "react-icons/io";
+import { MdEdit } from "react-icons/md";
 import avatar from "../../../../assets/avatar.jpg"
 import ProfileModal from "./modal/profileModal";
 import { useModalStates } from "../../../../hooks/store";
@@ -11,17 +12,20 @@ export default function Profile() {
             <ProfileModal />
             <MainLayout>
                 <div className="flex flex-col lg:grid lg:grid-cols-3 w-full h-full gap-4">
-                    <div className="flex items-center justify-center w-full bg-slate-100 shadow-xl/20 rounded-md p-2">
-                        <div className="bg-white p-2 rounded-full shadow-xl/20">
+                    <div className="flex items-center justify-center w-full bg-slate-50 shadow-xl/10 rounded-md p-2">
+                        <div className="bg-white p-2 rounded-full shadow-xl/10">
                             <img src={avatar} alt="" className="md:w-[17rem] md:h-[17rem] w-[10rem] h-[10rem] rounded-full" />
                         </div>
                     </div>
                     <div className="grid grid-rows-4 gap-4">
-                        <div className="flex flex-col items-center justify-center w-full h-full bg-slate-100 shadow-xl/20 rounded-md leading-none">
+                        <div className="flex flex-col items-center justify-center w-full h-full bg-slate-50 shadow-xl/10 rounded-md leading-none">
                             <span className="flex items-center justify-center text-[2.5rem] w-full uppercase font-bebas">Administrative Staff</span>
                             <span className="flex items-center justify-center text-[.7rem] w-full uppercase font-montserrat">Registrar’s Office</span>
                         </div>
-                        <div className="row-span-3 w-full h-full bg-slate-100 shadow-xl/20 rounded-md p-4">
+                        <div className="row-span-3 w-full h-full bg-slate-50 shadow-xl/10 rounded-md p-4 relative">
+                            <button className="flex items-center justify-center w-5 h-5 rounded-md cursor-pointer focus:ring-2 bg-green-400 focus:ring-green-600 ring-offset-1 hover:bg-green-500 absolute right-4 top-4">
+                                <MdEdit className="text-slate-800" />
+                            </button>
                             <div className="flex flex-col leading-none p-4">
                                 <span className="flex items-center justify-center text-[2rem] w-full uppercase font-bebas">John Doe</span>
                                 <span className="flex items-center justify-center text-[.7rem] w-full uppercase font-montserrat">JD-0002</span>
@@ -64,7 +68,10 @@ export default function Profile() {
                             </div>
                         </div>
                     </div>
-                    <div className="flex flex-col justify-between p-4 w-full h-full bg-slate-100 shadow-xl/20 rounded-md">
+                    <div className="flex flex-col justify-between p-4 w-full h-full bg-slate-50 shadow-xl/10 rounded-md relative">
+                        <button className="flex items-center justify-center w-5 h-5 rounded-md cursor-pointer focus:ring-2 bg-green-400 focus:ring-green-600 ring-offset-1 hover:bg-green-500 absolute right-4 top-4">
+                            <MdEdit className="text-slate-800" />
+                        </button>
                         <span className="flex items-center justify-center text-[2.5rem] w-full uppercase font-bebas">Job Description</span>
                         <div className="flex flex-col h-full text-[.8rem] gap-4">
                             <div className="flex flex-col font-montserrat">
