@@ -68,44 +68,46 @@ export default function Profile() {
                             </div>
                         </div>
                     </div>
-                    <div className="flex flex-col justify-between p-4 w-full h-full bg-slate-50 shadow-xl/10 rounded-md relative">
+                    <div className="flex flex-col p-4 w-full h-full bg-slate-50 shadow-xl/10 rounded-md relative">
                         <button className="flex items-center justify-center w-5 h-5 rounded-md cursor-pointer focus:ring-2 bg-green-400 focus:ring-green-600 ring-offset-1 hover:bg-green-500 absolute right-4 top-4">
                             <MdEdit className="text-slate-800" />
                         </button>
                         <span className="flex items-center justify-center text-[2.5rem] w-full uppercase font-bebas">Job Description</span>
-                        <div className="flex flex-col h-full text-[.8rem] gap-4">
-                            <div className="flex flex-col font-montserrat">
-                                <span className="uppercase font-montserrat font-semibold">Key Responsibilities</span>
-                                <div className="flex flex-col gap-2 leading-none">
-                                    <li><span className="italic">Handle filing, data entry, and document management.</span></li>
-                                    <li><span className="italic">Assist in preparing reports, memos, and correspondence.</span></li>
-                                    <li><span className="italic">Manage schedules, appointments, and meeting logistics.</span></li>
-                                    <li><span className="italic">Provide customer service to students, faculty, and visitors.</span></li>
-                                    <li><span className="italic">Support events, programs, and office initiatives.</span></li>
+                        <div className="flex flex-col h-full w-full justify-between gap-4">
+                            <div className="flex flex-col h-full text-[.8rem] gap-4">
+                                <div className="flex flex-col font-montserrat">
+                                    <span className="uppercase font-montserrat font-semibold">Key Responsibilities</span>
+                                    <div className="flex flex-col gap-2 leading-none">
+                                        <li><span className="italic">Handle filing, data entry, and document management.</span></li>
+                                        <li><span className="italic">Assist in preparing reports, memos, and correspondence.</span></li>
+                                        <li><span className="italic">Manage schedules, appointments, and meeting logistics.</span></li>
+                                        <li><span className="italic">Provide customer service to students, faculty, and visitors.</span></li>
+                                        <li><span className="italic">Support events, programs, and office initiatives.</span></li>
+                                    </div>
+                                </div>
+                                <div className="flex flex-col font-montserrat">
+                                    <span className="uppercase font-montserrat font-semibold">Qualifications</span>
+                                    <div className="flex flex-col gap-2 leading-none">
+                                        <li><span className="italic">Bachelor’s Degree in Office Administration, Business Administration, or related field.</span></li>
+                                        <li><span className="italic">Proficiency in MS Office and database systems.</span></li>
+                                        <li><span className="italic">Strong organizational and multitasking skills.</span></li>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="flex flex-col font-montserrat">
-                                <span className="uppercase font-montserrat font-semibold">Qualifications</span>
-                                <div className="flex flex-col gap-2 leading-none">
-                                    <li><span className="italic">Bachelor’s Degree in Office Administration, Business Administration, or related field.</span></li>
-                                    <li><span className="italic">Proficiency in MS Office and database systems.</span></li>
-                                    <li><span className="italic">Strong organizational and multitasking skills.</span></li>
-                                </div>
+                            <div className="flex flex-col gap-2">
+                                <button onClick={() => useModalStates.setState({ profileModal: true })} className="w-full h-[2rem] rounded-md bg-green-400 capitalize font-semibold focus:ring-2 focus:ring-green-600 ring-offset-1 hover:bg-green-500 text-white cursor-pointer">
+                                    <div className="flex items-center justify-center gap-1">
+                                        <span className="">download</span>
+                                        <IoMdDownload />
+                                    </div>
+                                </button>
+                                <button className="w-full h-[2rem] rounded-md bg-blue-400 capitalize font-semibold focus:ring-2 focus:ring-blue-600 ring-offset-1 hover:bg-blue-500 text-white cursor-pointer">
+                                    <div className="flex items-center justify-center gap-1">
+                                        <span className="">print</span>
+                                        <IoMdPrint />
+                                    </div>
+                                </button>
                             </div>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <button onClick={() => useModalStates.setState({ profileModal: true })} className="w-full h-[2rem] rounded-md bg-green-400 capitalize font-semibold focus:ring-2 focus:ring-green-600 ring-offset-1 hover:bg-green-500 text-white cursor-pointer">
-                                <div className="flex items-center justify-center gap-1">
-                                    <span className="">download</span>
-                                    <IoMdDownload />
-                                </div>
-                            </button>
-                            <button className="w-full h-[2rem] rounded-md bg-blue-400 capitalize font-semibold focus:ring-2 focus:ring-blue-600 ring-offset-1 hover:bg-blue-500 text-white cursor-pointer">
-                                <div className="flex items-center justify-center gap-1">
-                                    <span className="">print</span>
-                                    <IoMdPrint />
-                                </div>
-                            </button>
                         </div>
                     </div>
                 </div>

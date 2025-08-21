@@ -8,9 +8,11 @@ interface ModalState {
 
 interface SidebarState {
     itemState: any,
-    dropState: boolean
-    toggleItemState: () => void,
-    toggleDropState: () => void,
+    dropIndex: number | null
+    sidebarState: boolean,
+    toggleItemState: (index: number | null) => void,
+    setDropIndex: (index: number | null) => void,
+    toggleSidebarState: (index: boolean) => void,
 }
 
 export const useModalStates = create<ModalState>()(
@@ -28,11 +30,13 @@ export const useSidebarStates = create<SidebarState>()(
         persist(
             (set) => ({
                 itemState: 0,
-                dropState: false,
-                toggleItemState: () => set((state: { itemState: any }) => ({ itemState: state.itemState, })),
-                toggleDropState: () => set((state: { itemState: any }) => ({ itemState: !state.itemState, })),
+                dropIndex: null,
+                sidebarState: true,
+                toggleItemState: (index) => set({ itemState: index }),
+                setDropIndex: (index) => set({ dropIndex: index }),
+                toggleSidebarState: (index) => set({ sidebarState: !index }),
             }),
-            { name: 'modalStates' }
+            { name: 'sidebarStates' }
         )
     ),
 )
