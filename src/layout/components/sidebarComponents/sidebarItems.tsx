@@ -21,7 +21,6 @@ export const Items = [
     { type: "item", label: "Performance Rating", link: "/performance-rating", icon: <FaStar /> },
     { type: "item", label: "Performance Interventions", link: "/performance-interventions", icon: <PiIntersect /> },
     { type: "item", label: "Coaching & Mentoring", link: "/coaching-mentoring", icon: <SiMentorcruise /> },
-    // { type: "item", label: "Others", link: "/others", icon: <TbSquareAsteriskFilled /> },
     {
         type: "drop",
         label: "Others",
@@ -31,5 +30,5 @@ export const Items = [
             { label: "Template", link: "/template", index: 6.2 },
             { label: "Development Plan", link: "/development-plan", index: 6.3 },
         ]
-    }
+    },
 ]

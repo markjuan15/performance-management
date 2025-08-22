@@ -39,3 +39,12 @@ export const development_plan = [
     { dev_need: "ICT Skills", learning_act: "Hands-on training on Google Classroom", target_completion: "October 2025", status_remarks: "Completed" },
     { dev_need: "Research & Innovation", learning_act: "Conduct action research in English subject", target_completion: "March 2026", status_remarks: "Ongoing" },
 ]
+
+export const rating_competency = [
+    { competency: "Job Knowledge", description: "Accuracy, thoroughness, and output standards.", rating: "" },
+    { competency: "Quality of Work", description: "Timeliness and efficiency in task completion.", rating: "" },
+    { competency: "Productivity", description: "Timeliness and efficiency in task completion.", rating: "" },
+    { competency: "Teamwork & Collaboration", description: "Works effectively with others.", rating: "" },
+    { competency: "Communication Skills", description: "Effectiveness in oral and written communication.", rating: "" },
+    { competency: "Initiative & Innovation", description: "Creativity and problem-solving.", rating: "" },
+]

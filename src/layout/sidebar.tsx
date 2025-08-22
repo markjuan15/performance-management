@@ -9,7 +9,7 @@ export default function MySidebar() {
     const { sidebarState, toggleSidebarState } = useSidebarStates()
 
     return (
-        <div className={`bg-white h-full transition-all duration-200 ease-in-out ${sidebarState ? `min-w-[14rem]` : `w-[4rem]`} relative`}>
+        <div className={`bg-white h-full relative shrink-0 ${sidebarState ? `w-[14rem]` : `w-[3rem]`} transition-[width] duration-200 ease-in-out`}>
             <div onClick={() => toggleSidebarState(sidebarState)} className="flex items-center justify-center bg-green-300 rounded-full p-[.15rem] absolute -right-[.5rem] top-0 leading-none cursor-pointer z-10">
                 <IoMdArrowRoundForward className={`text-slate-700 font-bold text-[.8rem] duration-200 ${sidebarState ? `rotate-180` : `rotate-0`}`} />
             </div>
@@ -17,10 +17,10 @@ export default function MySidebar() {
                 <div className="flex flex-col overflow-auto scrollbar-none p-2 relative">
                     <div className="flex flex-col gap-2">
                         {Items?.map((value: any, index: any) =>
-                            <div key={index}>
+                            <div className="flex flex-col gap-2" key={index}>
+                                {index === (Items.length - 1) && <div className="w-full border-b-[.05rem] border-b-slate-300" />}
                                 {value.type === "item" ?
                                     <div key={index}>
-                                        {index === (Items.length - 1) && <div className="w-full h-[.05rem] my-2 bg-slate-600" />}
                                         <SidebarItems link={value.link} label={value.label} icon={value.icon} index={index} key={index} />
                                     </div>
                                     :
