@@ -24,11 +24,9 @@ export default function MySidebar() {
                                         <SidebarItems link={value.link} label={value.label} icon={value.icon} index={index} key={index} />
                                     </div>
                                     :
-                                    <DropItem label={value.label} icon={value.icon} index={index} >
+                                    <DropItem label={value.label} icon={value.icon} index={index} key={index}>
                                         {value?.items?.map((value: any, index: any) =>
-                                            <>
-                                                <DropdownItems link={value.link} index={value.index} label={value.label} key={index} />
-                                            </>
+                                            <DropdownItems link={value.link} index={value.index} label={value.label} key={index} />
                                         )}
                                     </DropItem>
                                 }

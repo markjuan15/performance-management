@@ -9,6 +9,8 @@ import PerformanceRating from './component/mainComponent/pages/performanceRating
 import PerformanceInterventions from './component/mainComponent/pages/performanceInterventions/performanceInterventions'
 import CoachingMentoring from './component/mainComponent/pages/coachingMentoring/coachingMentoring'
 import Others from './component/mainComponent/pages/others/others'
+import Login from './component/mainComponent/credentials/login'
+import LoginSuccess from './component/loginSuccess'
 
 export default function App() {
 
@@ -26,6 +28,8 @@ export default function App() {
         <Route path="/performance-interventions" element={<PerformanceInterventions />}></Route>
         <Route path="/coaching-mentoring" element={<CoachingMentoring />}></Route>
         <Route path="/others" element={<Others />}></Route>
+        <Route path="/login" element={<Login />}></Route>
+        <Route path="/login-success" element={<LoginSuccess />}></Route>
       </Routes>
     </BrowserRouter>
   )
