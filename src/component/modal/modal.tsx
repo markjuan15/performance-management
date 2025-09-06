@@ -10,7 +10,7 @@ interface Iprops {
 export default function Modal({ state, children, closeState, title }: Iprops) {
 
     return state ? (
-        <div className="flex fixed flex-col items-center justify-center bg-[#00000091] w-screen h-screen z-10 top-0 left-0 backdrop-blur-[.05rem]">
+        <div className="flex fixed flex-col items-center justify-center bg-[#00000091] w-screen h-screen z-20 top-0 left-0 backdrop-blur-[.05rem]">
             <div className="flex flex-col items-center justify-center w-screen lg:w-[40rem] h-auto bg-white rounded-md">
                 <div className="flex items-center justify-center w-full h-[3rem] border-b border-b-slate-300 relative">
                     <span className="font-montserrat">{title}</span>

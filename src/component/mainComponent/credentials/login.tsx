@@ -4,8 +4,24 @@ import { FaUserAlt } from "react-icons/fa";
 import TextInput from "../../../inputs/textInput";
 import PasswordInput from "../../../inputs/passwordInput";
 import { useLogin } from "../../../hooks/getInfoHook";
+import { supabase } from "./components/supabaseClient"
+import google from "../../../assets/google.png"
 
 export default function Login() {
+
+    const signUp = async () => {
+
+        await supabase.auth.signInWithOAuth({
+            provider: "google",
+            options: {
+                redirectTo: "http://localhost:5173/login-success",
+                queryParams: {
+                    prompt: "select_account",
+                }
+            },
+        })
+    }
+
     const { mutate: regUser, isSuccess: createIsSuccess, isLoading: isLoadingDone } = useLogin()
 
     type FormValues = {
@@ -26,8 +42,6 @@ export default function Login() {
     }
     const username = register("username")
     const password = register("password")
-    // const username = register("username", { required: { value: true, message: "this field is required!" } })
-    // const password = register("password", { required: { value: true, message: "this field is required!" } })
 
     return (
         <div className="flex flex-col md:flex-row lg:flex-row items-center justify-center w-screen h-screen gap-10 md:gap-11 lg:gap-28 p-4 bg-slate-100">
@@ -45,7 +59,10 @@ export default function Login() {
                         <button type="submit" className="bg-[#0866ff] rounded h-10 w-full text-white font-medium">Log In</button>
                     </form>
                     <div className="flex flex-col items-center justify-center gap-1">
-                        <button onClick={() => { window.open(`/api/auth/google`, "_self") }} className="bg-[#ffffff] rounded h-10 w-full text-black font-normal border border-gray-300">Login with Google</button>
+                        <button onClick={signUp} className="flex items-center justify-center gap-3 cursor-pointer focus:ring-2 focus:ring-blue-300 bg-[#ffffff] rounded h-10 w-full text-black font-normal border border-gray-300">
+                            <img src={google} className="w-6" alt="" />
+                            <span className="">Sign in with Google</span>
+                        </button>
                         <a className="text-sm text-[#0866ff] hover:underline">Forgot password?</a>
                     </div>
                     <div className="w-full bg-slate-300 p-[.05rem] my-2"></div>
@@ -60,6 +77,6 @@ export default function Login() {
                     </div>
                 </div>
             </div>
-        </div >
+        </div>
     )
 }

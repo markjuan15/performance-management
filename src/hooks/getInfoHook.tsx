@@ -1,7 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { Bounce, toast } from 'react-toastify';
-import { axiosPost } from "./ajaxHook";
+import { axiosPost, axiosPost2 } from "./ajaxHook";
+import { useSidebarStates } from "./store";
 
 const getLogin = (payLoad?: any) => {
     const url = "/api/login";
@@ -54,6 +55,25 @@ export const useLogin: any = () => {
                         }, 50)
                     }
                 });
+            }
+        },
+    });
+};
+
+const getSaveUser = (payLoad?: any) => {
+    const url = "/api/main/google-login";
+    return axiosPost2(url, payLoad);
+};
+
+export const useSaveUser: any = () => {
+    const navigate = useNavigate()
+    const { toggleSidebarState } = useSidebarStates()
+    return useMutation({
+        mutationFn: getSaveUser,
+        onSuccess: (data) => {
+            if (data.status) {
+                toggleSidebarState(false)
+                navigate("/")
             }
         },
     });

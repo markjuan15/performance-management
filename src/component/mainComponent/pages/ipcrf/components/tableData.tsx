@@ -41,8 +41,8 @@ export const development_plan = [
 ]
 
 export const rating_competency = [
-    { competency: "Job Knowledge", description: "Accuracy, thoroughness, and output standards.", rating: "" },
-    { competency: "Quality of Work", description: "Timeliness and efficiency in task completion.", rating: "" },
+    { competency: "Job Knowledge", description: "Understanding of duties, responsibilities, and processes.", rating: "" },
+    { competency: "Quality of Work", description: "Accuracy, thoroughness, and output standards.", rating: "" },
     { competency: "Productivity", description: "Timeliness and efficiency in task completion.", rating: "" },
     { competency: "Teamwork & Collaboration", description: "Works effectively with others.", rating: "" },
     { competency: "Communication Skills", description: "Effectiveness in oral and written communication.", rating: "" },

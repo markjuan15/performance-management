@@ -1,33 +1,24 @@
-import axios from "axios"
-import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+import { supabase } from "./mainComponent/credentials/components/supabaseClient"
+import { useSaveUser } from "../hooks/getInfoHook"
+import { useEffect } from "react"
 
 export default function LoginSuccess() {
     const navigate = useNavigate()
+    const { mutate: saveUser } = useSaveUser()
+
     useEffect(() => {
         const handleAuth = async () => {
-            const params = new URLSearchParams(window.location.search)
-            const accessToken = params.get("token")
+            const { data: { session }, error } = await supabase.auth.getSession();
 
-            if (accessToken) {
-                localStorage.setItem("accessToken", accessToken)
-                try {
-                    const response = await axios.get("/api/auth/me", {
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`
-                        },
-                    });
-
-                    if (response.data.success) {
-                        navigate("/")
-                    }
-                } catch (error) {
-                    console.error("Error fetching user: ", error)
-                }
+            if (session) {
+                saveUser(JSON.stringify(session))
+            } else {
+                navigate("/login")
             }
         }
         handleAuth()
-    }, [navigate])
+    }, [])
 
     return (
         <main className="flex h-screen justify-center items-center bg-slate-100">
