@@ -9,7 +9,7 @@ export default function LoginSuccess() {
 
     useEffect(() => {
         const handleAuth = async () => {
-            const { data: { session }, error } = await supabase.auth.getSession();
+            const { data: { session } } = await supabase.auth.getSession();
 
             if (session) {
                 saveUser(JSON.stringify(session))
