@@ -10,7 +10,6 @@ import google from "../../../assets/google.png"
 export default function Login() {
 
     const signUp = async () => {
-
         await supabase.auth.signInWithOAuth({
             provider: "google",
             options: {
