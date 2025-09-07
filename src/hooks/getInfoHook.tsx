@@ -1,7 +1,7 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { Bounce, toast } from 'react-toastify';
-import { axiosPost, axiosPost2 } from "./ajaxHook";
+import { axiosGet, axiosGet2, axiosPost, axiosPost2 } from "./ajaxHook";
 import { useSidebarStates } from "./store";
 
 const getLogin = (payLoad?: any) => {

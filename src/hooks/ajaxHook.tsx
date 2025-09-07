@@ -43,13 +43,9 @@ export async function axiosGet(url: any, payload?: any) {
     }
 }
 
-export async function axiosGet2(url: any, token: any) {
+export async function axiosGet2(url: any) {
     try {
-        const response = await axios.get(url, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
+        const response = await axios.get(url);
         return response.data;
     } catch (e) {
         return e;
