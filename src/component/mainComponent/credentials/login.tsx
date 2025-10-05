@@ -13,7 +13,7 @@ export default function Login() {
         await supabase.auth.signInWithOAuth({
             provider: "google",
             options: {
-                redirectTo: "http://localhost:5173/login-success",
+                redirectTo: "http://localhost:5174/login-success",
                 queryParams: {
                     prompt: "select_account",
                 }

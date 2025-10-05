@@ -74,7 +74,7 @@ export default function Profile() {
                         </button>
                         <span className="flex items-center justify-center text-[2.5rem] w-full uppercase font-bebas">Job Description</span>
                         <div className="flex flex-col h-full w-full justify-between gap-4">
-                            <div className="flex flex-col h-full text-[.8rem] gap-4">
+                            <div className="flex flex-col h-full text-[.8rem] gap-4 p-4 pt-0">
                                 <div className="flex flex-col font-montserrat">
                                     <span className="uppercase font-montserrat font-semibold">Key Responsibilities</span>
                                     <div className="flex flex-col gap-2 leading-none">
