@@ -14,7 +14,7 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api/, '')
       }
     },
-    port: 5173
+    port: 5174
   },
   optimizeDeps: {
     exclude: ['js-big-decimal']
