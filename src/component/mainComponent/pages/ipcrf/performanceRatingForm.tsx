@@ -5,7 +5,8 @@ import MainLayout from "../../../../layout/main/mainLayout";
 // import Table, { TableBody, TableBodyRow, TableHead, TableHeadRow, TD, TH } from "../../../table/table";
 // import { competencies, functionalCompetencies, ratingSummary } from "./components/tableData";
 
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
+import { useSavePerformanceForm } from "../../../../hooks/getInfoHook";
 
 type KRAItem = {
     id: string;
@@ -31,9 +32,9 @@ const DEFAULT_KRA = (): KRAItem => ({
     weight: 0,
     target: "",
     mov: "",
-    q: 3,
-    e: 3,
-    t: 3,
+    q: 1,
+    e: 1,
+    t: 1,
     collapsed: false,
 });
 
@@ -45,9 +46,10 @@ const ADJECTIVAL = new Map<number, string>([
     [1, "Poor"],
 ]);
 
-const API_ENDPOINT = "/api/ipcrf";
-
 export default function PerformanceRatingForm() {
+
+    const { mutate, isLoading } = useSavePerformanceForm()
+
     const [kraRows, setKraRows] = useState<KRAItem[]>([DEFAULT_KRA()]);
     const [employeeName, setEmployeeName] = useState("");
     const [employeePosition, setEmployeePosition] = useState("");
@@ -59,18 +61,18 @@ export default function PerformanceRatingForm() {
 
 
     const [coreCompetencies, setCoreCompetencies] = useState({
-        selfManagement: 4,
-        professionalism: 4,
-        resultFocus: 4,
-        teamwork: 4,
-        serviceOrientation: 4,
-        innovation: 4,
+        selfManagement: 1,
+        professionalism: 1,
+        resultFocus: 1,
+        teamwork: 1,
+        serviceOrientation: 1,
+        innovation: 1,
     });
 
     const [leadershipCompetencies, setLeadershipCompetencies] = useState({
-        leadingPeople: 4,
-        peopleDevelopment: 4,
-        peoplePerformanceMgmt: 4,
+        leadingPeople: 1,
+        peopleDevelopment: 1,
+        peoplePerformanceMgmt: 1,
     });
 
     const [developmentPlan, setDevelopmentPlan] = useState({
@@ -80,9 +82,6 @@ export default function PerformanceRatingForm() {
         timeline: "",
         resources: "",
     });
-
-    const [submitting, setSubmitting] = useState(false);
-    const [apiResult, setApiResult] = useState<string | null>(null);
 
     const updateKRA = (id: string, partial: Partial<KRAItem>) => {
         setKraRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...partial } : r)));
@@ -123,51 +122,36 @@ export default function PerformanceRatingForm() {
         return k + c + l;
     }, [totals, coreAverage, leadershipAverage]);
 
-    async function handleSubmit(e?: React.FormEvent) {
-        if (e) e.preventDefault();
-        setSubmitting(true);
-        setApiResult(null);
-        try {
-            const payload = {
-                employeeInfo: {
-                    employeeName,
-                    employeePosition,
-                    reviewPeriod,
-                    phaseDate,
-                    raterName,
-                    raterPosition,
-                    bureauDivision,
-                },
-                kraRows,
-                totals,
-                coreCompetencies,
-                coreAverage,
-                leadershipCompetencies,
-                leadershipAverage,
-                developmentPlan,
-                finalPerformanceRating,
-            };
-            const res = await fetch(API_ENDPOINT, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-            });
-            setApiResult(res.ok ? "Submitted successfully." : `Error: ${res.status}`);
-        } catch {
-            setApiResult("Network error while submitting.");
-        } finally {
-            setSubmitting(false);
-        }
+    function handleSubmit() {
+        const payload = {
+            employeeInfo: {
+                employeeName,
+                employeePosition,
+                reviewPeriod,
+                phaseDate,
+                raterName,
+                raterPosition,
+                bureauDivision,
+            },
+            kraRows,
+            totals,
+            coreCompetencies,
+            coreAverage,
+            leadershipCompetencies,
+            leadershipAverage,
+            developmentPlan,
+            finalPerformanceRating,
+        };
+        mutate(JSON.stringify(payload))
     }
 
     return (
         <MainLayout>
-            <div className="min-h-screen bg-gray-50 p-6">
-                <div className="max-w-6xl mx-auto space-y-10">
+            <div className="min-h-screen">
+                <div className="flex flex-col gap-4">
                     <header className="flex justify-between items-center flex-wrap">
                         <div>
                             <h1 className="text-2xl font-bold">IPCRF — Individual Performance Commitment & Review</h1>
-                            <p className="text-gray-500">Parts I–IV (Card Layout)</p>
                         </div>
                     </header>
 
@@ -190,64 +174,67 @@ export default function PerformanceRatingForm() {
 
                     {/* Part I */}
                     <section>
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-semibold mb-3">Part I — Key Result Areas</h2>
-                            <button onClick={addKRA} className="bg-blue-500 text-white p-3 rounded-full shadow-md/20 cursor-pointer">
-                                <FaPlus />
-                            </button>
-                        </div>
                         <div className="flex flex-col gap-4">
-                            {totals.rows.map((r) => {
-                                const expandedMaxH = 2000;
-                                return (
-                                    <div key={r.id} className="bg-slate-100 rounded-md shadow-md/20 relative">
-                                        <button type="button" onClick={() => removeKRA(r.id)} className="text-red-500 p-2 rounded-full bg-red-200 text-[.9rem] absolute -right-3 -top-3 cursor-pointer" >
-                                            <FaTrashCan />
-                                        </button>
-                                        <div onClick={() => toggleCollapse(r.id)} className="cursor-pointer bg-slate-200 p-3 flex justify-between items-center rounded-t-md">
-                                            <h3 className="font-semibold text-indigo-700">
-                                                {r.kra || "New KRA"}
-                                            </h3>
-                                            <div className="flex justify-end">
-                                                <span className="flex items-center justify-center gap-2 text-sm text-gray-600">
-                                                    <IoIosArrowDown className={`${r.collapsed ? 'rotate-0' : 'rotate-180'} duration-150 ease-in-out`} />
-                                                    {r.collapsed ? "Expand" : "Collapse"}
-                                                </span>
+                            <div className="flex items-center justify-start gap-4">
+                                <h2 className="text-lg font-semibold">Part I — Key Result Areas</h2>
+                            </div>
+                            <div className="flex flex-col gap-4">
+                                {totals.rows.map((r) => {
+                                    const expandedMaxH = 2000;
+                                    return (
+                                        <div key={r.id} className="bg-slate-100 rounded-md shadow-md/20 relative">
+                                            <button type="button" onClick={() => removeKRA(r.id)} className={`text-red-500 p-2 rounded-full bg-red-200 text-[.9rem] absolute -right-3 -top-3 cursor-pointer transition-all duration-300 ${totals.rows.length <= 1 && `opacity-0 invisible`}`} disabled={totals.rows.length <= 1}>
+                                                <FaTrashCan />
+                                            </button>
+                                            <div onClick={() => toggleCollapse(r.id)} className="cursor-pointer bg-slate-200 p-3 flex justify-between items-center rounded-t-md">
+                                                <h3 className="font-semibold text-indigo-700">
+                                                    {r.kra || "New KRA"}
+                                                </h3>
+                                                <div className="flex justify-end">
+                                                    <span className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                                                        <IoIosArrowDown className={`${r.collapsed ? 'rotate-0' : 'rotate-180'} duration-150 ease-in-out`} />
+                                                        {r.collapsed ? "Expand" : "Collapse"}
+                                                    </span>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="transition-all duration-300 ease-in-out" style={{ maxHeight: r.collapsed ? 0 : expandedMaxH, }} >
-                                            <div className={`p-4 transition-opacity duration-300 ${r.collapsed ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
-                                                <div className="flex flex-col gap-2">
-                                                    <div className="grid grid-cols-2 gap-2">
-                                                        <Input label="MFO" value={r.mfo} onChange={(v: any) => updateKRA(r.id, { mfo: v })} />
-                                                        <Input label="KRA" value={r.kra} onChange={(v: any) => updateKRA(r.id, { kra: v })} />
-                                                    </div>
-                                                    <TeaxtArea label="Objective" value={r.objective} onChange={(v: any) => updateKRA(r.id, { objective: v })} />
-                                                    <div className="grid grid-cols-2 gap-2">
-                                                        <Input label="Timeline" value={r.timeline} onChange={(v: any) => updateKRA(r.id, { timeline: v })} />
-                                                        <Input label="Weight (%)" type="number" value={r.weight} onChange={(v: any) => updateKRA(r.id, { weight: Number(v) })} />
-                                                    </div>
-                                                    <Input label="Target" value={r.target} onChange={(v: any) => updateKRA(r.id, { target: v })} />
-                                                    <TeaxtArea label="MOV / Actual Result" value={r.mov} onChange={(v: any) => updateKRA(r.id, { mov: v })} />
-                                                    <div className="grid grid-cols-3 gap-2">
-                                                        <SelectRating label="Q" value={r.q} onChange={(v: any) => updateKRA(r.id, { q: v })} />
-                                                        <SelectRating label="E" value={r.e} onChange={(v: any) => updateKRA(r.id, { e: v })} />
-                                                        <SelectRating label="T" value={r.t} onChange={(v: any) => updateKRA(r.id, { t: v })} />
+                                            <div className="transition-all duration-300 ease-in-out" style={{ maxHeight: r.collapsed ? 0 : expandedMaxH, }} >
+                                                <div className={`p-4 transition-opacity duration-300 ${r.collapsed ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
+                                                    <div className="flex flex-col gap-2">
+                                                        <div className="grid grid-cols-2 gap-2">
+                                                            <Input label="MFO" value={r.mfo} onChange={(v: any) => updateKRA(r.id, { mfo: v })} />
+                                                            <Input label="KRA" value={r.kra} onChange={(v: any) => updateKRA(r.id, { kra: v })} />
+                                                        </div>
+                                                        <TeaxtArea label="Objective" value={r.objective} onChange={(v: any) => updateKRA(r.id, { objective: v })} />
+                                                        <div className="grid grid-cols-2 gap-2">
+                                                            <Input label="Timeline" value={r.timeline} onChange={(v: any) => updateKRA(r.id, { timeline: v })} />
+                                                            <Input label="Weight (%)" type="number" value={r.weight} onChange={(v: any) => updateKRA(r.id, { weight: Number(v) })} />
+                                                        </div>
+                                                        <Input label="Target" value={r.target} onChange={(v: any) => updateKRA(r.id, { target: v })} />
+                                                        <TeaxtArea label="MOV / Actual Result" value={r.mov} onChange={(v: any) => updateKRA(r.id, { mov: v })} />
+                                                        <div className="grid grid-cols-3 gap-2">
+                                                            <SelectRating label="Q" value={r.q} onChange={(v: any) => updateKRA(r.id, { q: v })} />
+                                                            <SelectRating label="E" value={r.e} onChange={(v: any) => updateKRA(r.id, { e: v })} />
+                                                            <SelectRating label="T" value={r.t} onChange={(v: any) => updateKRA(r.id, { t: v })} />
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div className="flex justify-between text-sm bg-slate-200 px-4 py-2 rounded-b-md">
+                                                <span>Average: <strong>{(r.avg || 0).toFixed(2)}</strong></span>
+                                                <span>Score: <strong>{(r.score || 0).toFixed(2)}</strong></span>
+                                            </div>
                                         </div>
-                                        <div className="flex justify-between text-sm bg-slate-200 px-4 py-2 rounded-b-md">
-                                            <span>Average: <strong>{(r.avg || 0).toFixed(2)}</strong></span>
-                                            <span>Score: <strong>{(r.score || 0).toFixed(2)}</strong></span>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
+                                    );
+                                })}
+                            </div>
 
-                        <div className="mt-4 text-sm text-gray-600">
-                            Total Weight: <strong>{totals.totalWeight}%</strong> | Overall Avg: <strong>{totals.overallRating.toFixed(2)}</strong> | Total Score: <strong>{totals.totalScore.toFixed(2)}</strong>
+                            <button onClick={addKRA} className="flex  items-center justify-center text-center bg-blue-500 text-white p-3 rounded-md shadow-md/20 cursor-pointer">
+                                <FaPlus />
+                            </button>
+
+                            <div className="text-sm text-gray-600">
+                                Total Weight: <strong>{totals.totalWeight}%</strong> | Overall Avg: <strong>{totals.overallRating.toFixed(2)}</strong> | Total Score: <strong>{totals.totalScore.toFixed(2)}</strong>
+                            </div>
                         </div>
                     </section>
 
@@ -313,11 +300,10 @@ export default function PerformanceRatingForm() {
                     </section>
 
                     <div className="flex justify-end">
-                        <button onClick={(e) => handleSubmit(e as any)} className="bg-blue-600 text-white px-4 py-2 rounded shadow" disabled={submitting}>
-                            {submitting ? "Submitting..." : "Submit to API"}
+                        <button onClick={() => handleSubmit()} className="bg-blue-600 text-white px-4 py-2 rounded shadow" disabled={isLoading}>
+                            {isLoading ? "Submitting..." : "Submit to API"}
                         </button>
                     </div>
-                    {apiResult && <div className="text-sm mt-2">{apiResult}</div>}
                 </div>
             </div>
         </MainLayout>

@@ -78,3 +78,17 @@ export const useSaveUser: any = () => {
         },
     });
 };
+
+const getSavePerformanceForm = (payLoad?: any) => {
+    const url = "/api/performance/performance-management";
+    return axiosPost2(url, payLoad);
+};
+
+export const useSavePerformanceForm: any = () => {
+    return useMutation({
+        mutationFn: getSavePerformanceForm,
+        onSuccess: (data) => {
+            console.log(data)
+        },
+    });
+};
