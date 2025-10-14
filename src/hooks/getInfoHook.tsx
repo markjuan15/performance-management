@@ -92,3 +92,17 @@ export const useSavePerformanceForm: any = () => {
         },
     });
 };
+
+const getPerformanceRating = (payLoad?: any) => {
+    const url = "/api/performance/get-performance-rating";
+    return axiosPost2(url, payLoad);
+};
+
+export const useGetPerformanceRating: any = () => {
+    return useMutation({
+        mutationFn: getPerformanceRating,
+        onSuccess: (data) => {
+            console.log(JSON.parse(data.pm_ratings[0].rating))
+        },
+    });
+};

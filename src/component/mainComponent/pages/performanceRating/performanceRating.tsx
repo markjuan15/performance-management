@@ -1,16 +1,20 @@
+import { useGetPerformanceRating } from "../../../../hooks/getInfoHook";
 import MainLayout from "../../../../layout/main/mainLayout";
 import Caption from "../../../table/caption";
 import Table, { TableBody, TableBodyRow, TableHead, TableHeadRow, TD, TH } from "../../../table/table";
 import Cards from "../../components/cards";
 import { rating_competency } from "../ipcrf/components/tableData";
+import session from "../../../../hooks/supabaseHook"
 
 export default function PerformanceRating() {
+
+    const { mutate } = useGetPerformanceRating()
 
     return (
         <MainLayout>
             <div className="flex flex-col w-full">
                 <div className="flex items-center justify-center w-full p-2">
-                    <span className="font-semibold uppercase">Performance Rating</span>
+                    <span onClick={() => mutate({ googleId: session?.id })} className="font-semibold uppercase">Performance Rating</span>
                 </div>
                 <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-2 p-4 rounded-md bg-slate-50">

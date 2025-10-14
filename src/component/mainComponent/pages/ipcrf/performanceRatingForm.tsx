@@ -7,6 +7,7 @@ import MainLayout from "../../../../layout/main/mainLayout";
 
 import { useState, useMemo } from "react";
 import { useSavePerformanceForm } from "../../../../hooks/getInfoHook";
+import session from "../../../../hooks/supabaseHook";
 
 type KRAItem = {
     id: string;
@@ -121,7 +122,7 @@ export default function PerformanceRatingForm() {
     }, [totals, coreAverage, leadershipAverage])
 
     function handleSubmit() {
-        const payload = {
+        const payload = [{
             employeeInfo: {
                 employeeName,
                 employeePosition,
@@ -139,7 +140,9 @@ export default function PerformanceRatingForm() {
             leadershipAverage,
             developmentPlan,
             finalPerformanceRating,
-        };
+        }, {
+            googleId: session?.id
+        }];
         mutate(JSON.stringify(payload))
     }
 

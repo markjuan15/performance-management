@@ -1,9 +1,9 @@
 import { FaStar } from "react-icons/fa6";
 import { HiTable, HiUser } from "react-icons/hi";
 import { IoIosHome } from "react-icons/io";
-import { PiIntersect } from "react-icons/pi";
-import { SiMentorcruise } from "react-icons/si";
-import { TbSquareAsteriskFilled } from "react-icons/tb";
+// import { PiIntersect } from "react-icons/pi";
+// import { SiMentorcruise } from "react-icons/si";
+// import { TbSquareAsteriskFilled } from "react-icons/tb";
 
 export const Items = [
     { type: "item", label: "Home", link: "/", icon: <IoIosHome /> },
