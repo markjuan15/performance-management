@@ -58,8 +58,6 @@ export default function PerformanceRatingForm() {
     const [raterName, setRaterName] = useState("");
     const [raterPosition, setRaterPosition] = useState("");
     const [bureauDivision, setBureauDivision] = useState("");
-
-
     const [coreCompetencies, setCoreCompetencies] = useState({
         selfManagement: 1,
         professionalism: 1,
@@ -67,32 +65,32 @@ export default function PerformanceRatingForm() {
         teamwork: 1,
         serviceOrientation: 1,
         innovation: 1,
-    });
-
+    })
     const [leadershipCompetencies, setLeadershipCompetencies] = useState({
         leadingPeople: 1,
         peopleDevelopment: 1,
         peoplePerformanceMgmt: 1,
-    });
-
+    })
     const [developmentPlan, setDevelopmentPlan] = useState({
         strengths: "",
         needs: "",
         actionPlan: "",
         timeline: "",
         resources: "",
-    });
-
+    })
     const updateKRA = (id: string, partial: Partial<KRAItem>) => {
         setKraRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...partial } : r)));
-    };
-
-    const addKRA = () => setKraRows((p) => [...p, DEFAULT_KRA()]);
+    }
+    const addKRA = () => {
+        setKraRows((prev) => {
+            const collapsedPrev = prev.map((r) => ({ ...r, collapsed: true }));
+            return [...collapsedPrev, DEFAULT_KRA()];
+        })
+    }
     const removeKRA = (id: string) => setKraRows((p) => p.filter((r) => r.id !== id));
     const toggleCollapse = (id: string) => {
         setKraRows((prev) => prev.map((r) => (r.id === id ? { ...r, collapsed: !r.collapsed } : r)));
-    };
-
+    }
     const totals = useMemo(() => {
         const rows = kraRows.map((r) => {
             const avg = (r.q + r.e + r.t) / 3;
@@ -103,24 +101,24 @@ export default function PerformanceRatingForm() {
         const totalScore = rows.reduce((s, r) => s + r.score, 0);
         const overallRating = rows.length ? rows.reduce((s, r) => s + r.avg, 0) / rows.length : 0;
         return { rows, totalWeight, totalScore, overallRating };
-    }, [kraRows]);
+    }, [kraRows])
 
     const coreAverage = useMemo(() => {
         const vals = Object.values(coreCompetencies);
         return vals.reduce((s, v) => s + Number(v), 0) / vals.length;
-    }, [coreCompetencies]);
+    }, [coreCompetencies])
 
     const leadershipAverage = useMemo(() => {
         const vals = Object.values(leadershipCompetencies);
         return vals.reduce((s, v) => s + Number(v), 0) / vals.length;
-    }, [leadershipCompetencies]);
+    }, [leadershipCompetencies])
 
     const finalPerformanceRating = useMemo(() => {
         const k = (totals.overallRating || 0) * 0.7;
         const c = (coreAverage || 0) * 0.2;
         const l = (leadershipAverage || 0) * 0.1;
-        return k + c + l;
-    }, [totals, coreAverage, leadershipAverage]);
+        return k + c + l
+    }, [totals, coreAverage, leadershipAverage])
 
     function handleSubmit() {
         const payload = {
@@ -314,7 +312,7 @@ function Input({ label, value, onChange, type = "text" }: any) {
     return (
         <label className="block text-sm">
             <div className="text-xs text-gray-600 mb-1">{label}</div>
-            <input type={type} className="w-full p-2 border rounded" value={value} onChange={(e) => onChange(e.target.value)} />
+            <input type={type} className="w-full border-b p-1 active:outline-b outline-0 bg-slate-200" value={value} onChange={(e) => onChange(e.target.value)} />
         </label>
     );
 }
@@ -323,7 +321,7 @@ function TeaxtArea({ label, value, onChange }: any) {
     return (
         <label className="block text-sm">
             <div className="text-xs text-gray-600 mb-1">{label}</div>
-            <textarea className="w-full p-2 border rounded" value={value} onChange={(e) => onChange(e.target.value)} />
+            <textarea className="w-full border-b p-1 active:outline-b outline-0 bg-slate-200" value={value} onChange={(e) => onChange(e.target.value)} />
         </label>
     );
 }

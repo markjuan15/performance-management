@@ -18,7 +18,7 @@ export default function MySidebar() {
                     <div className="flex flex-col gap-2">
                         {Items?.map((value: any, index: any) =>
                             <div className="flex flex-col gap-2" key={index}>
-                                {index === (Items.length - 1) && <div className="w-full border-b-[.05rem] border-b-slate-300" />}
+                                {/* {index === (Items.length - 1) && <div className="w-full border-b-[.05rem] border-b-slate-300" />} */}
                                 {value.type === "item" ?
                                     <div key={index}>
                                         <SidebarItems link={value.link} label={value.label} icon={value.icon} index={index} key={index} />
