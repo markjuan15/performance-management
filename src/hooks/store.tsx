@@ -4,8 +4,10 @@ import { devtools, persist } from "zustand/middleware";
 interface ModalState {
     profileModal: boolean,
     performanceRatingFormModal: boolean,
+    performanceRatingModal: boolean,
     toggleEventModal: () => void,
     togglePerformanceRatingFormModal: (index: boolean) => void,
+    togglePerformanceRatingModal: (index: boolean) => void,
 }
 
 interface SidebarState {
@@ -22,8 +24,10 @@ export const useModalStates = create<ModalState>()(
         (set) => ({
             profileModal: false,
             performanceRatingFormModal: false,
+            performanceRatingModal: false,
             toggleEventModal: () => set((state: { profileModal: any }) => ({ profileModal: !state.profileModal, })),
             togglePerformanceRatingFormModal: (index) => set({ performanceRatingFormModal: !index }),
+            togglePerformanceRatingModal: (index) => set({ performanceRatingModal: !index }),
         }),
         { name: 'modalStates' },
     ),
