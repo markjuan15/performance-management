@@ -3,7 +3,9 @@ import { devtools, persist } from "zustand/middleware";
 
 interface ModalState {
     profileModal: boolean,
+    performanceRatingFormModal: boolean,
     toggleEventModal: () => void,
+    togglePerformanceRatingFormModal: (index: boolean) => void,
 }
 
 interface SidebarState {
@@ -19,7 +21,9 @@ export const useModalStates = create<ModalState>()(
     devtools(
         (set) => ({
             profileModal: false,
+            performanceRatingFormModal: false,
             toggleEventModal: () => set((state: { profileModal: any }) => ({ profileModal: !state.profileModal, })),
+            togglePerformanceRatingFormModal: (index) => set({ performanceRatingFormModal: !index }),
         }),
         { name: 'modalStates' },
     ),

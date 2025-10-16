@@ -29,12 +29,12 @@ export default function App() {
     return children ? children : <Outlet />;
   };
 
-  const AdminRoute = ({ user, children, redirectPath }: any) => {
-    if (user?.status === false || user?.usertype === "1") {
-      return <Navigate to={redirectPath} replace />;
-    }
-    return children ? children : <Outlet />;
-  };
+  // const AdminRoute = ({ user, children, redirectPath }: any) => {
+  //   if (user?.status === false || user?.usertype === "1") {
+  //     return <Navigate to={redirectPath} replace />;
+  //   }
+  //   return children ? children : <Outlet />;
+  // };
 
   return (
     <BrowserRouter>

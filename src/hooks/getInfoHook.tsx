@@ -4,6 +4,8 @@ import { Bounce, toast } from 'react-toastify';
 import { axiosPost, axiosPost2 } from "./ajaxHook";
 import { useSidebarStates } from "./store";
 
+import "react-toastify/dist/ReactToastify.css";
+
 const getLogin = (payLoad?: any) => {
     const url = "/api/login";
     return axiosPost(url, payLoad);
@@ -86,12 +88,45 @@ const getSavePerformanceForm = (payLoad?: any) => {
 
 export const useSavePerformanceForm: any = () => {
     return useMutation({
-        mutationFn: getSavePerformanceForm,
+        mutationFn: async (formData: any) => {
+            const toastId = toast("Saving form...", {
+                progress: 0,
+                type: "info",
+                isLoading: true,
+                autoClose: false,
+                closeOnClick: false,
+            });
+            try {
+                for (let i = 1; i <= 10; i++) {
+                    await new Promise((r) => setTimeout(r, 150));
+                    toast.update(toastId, { progress: i / 10 });
+                }
+                const response = await getSavePerformanceForm(formData);
+                toast.update(toastId, {
+                    render: "Form saved successfully!",
+                    type: "success",
+                    isLoading: false,
+                    progress: 1,
+                    autoClose: 2000,
+                });
+                return response;
+            } catch (error) {
+                toast.update(toastId, {
+                    render: "Error saving form. Please try again.",
+                    type: "error",
+                    isLoading: false,
+                    progress: 1,
+                    autoClose: 3000,
+                });
+                throw error;
+            }
+        },
         onSuccess: (data) => {
-            console.log(data)
+            console.log("Saved successfully:", data);
         },
     });
 };
+
 
 const getPerformanceRating = (payLoad?: any) => {
     const url = "/api/performance/get-performance-rating";
@@ -102,7 +137,7 @@ export const useGetPerformanceRating: any = () => {
     return useMutation({
         mutationFn: getPerformanceRating,
         onSuccess: (data) => {
-            console.log(JSON.parse(data.pm_ratings[0].rating))
+            console.log(JSON.parse(data.pm_ratings[4].rating))
         },
     });
 };

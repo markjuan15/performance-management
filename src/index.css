@@ -8,6 +8,7 @@
     src: url("../src/assets/fonts/Montserrat-VariableFont_wght.ttf");
 }
 
+
 @import "tailwindcss";
 @plugin 'tailwind-scrollbar';
 @plugin "flowbite-react/plugin/tailwindcss";
@@ -16,4 +17,22 @@
 @theme {
     --font-bebas: Bebas, "sans-serif";
     --font-montserrat: Montserrat, "sans-serif";
+}
+
+.toast-centered {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 9999 !important;
+    min-width: 320px;
+    text-align: center;
+}
+
+.no-pointer-events {
+    pointer-events: none !important;
+}
+
+.Toastify__toast-body>* {
+    pointer-events: auto !important;
 }
