@@ -11,7 +11,7 @@ export default function PerformanceRatingFormModal({ onCancel, onConfirm }: Ipro
     const { performanceRatingFormModal, togglePerformanceRatingFormModal } = useModalStates()
     return (
         <Modal state={performanceRatingFormModal} closeState={() => togglePerformanceRatingFormModal(performanceRatingFormModal)} title={"Performance Rating Form"}>
-            <div className="flex flex-col items-center justify-center w-[30rem] h-full gap-5 p-4 py-[4rem] leading-none">
+            <div className="flex flex-col items-center justify-center w-full lg:w-[30rem] h-full gap-5 p-4 py-[4rem] leading-none">
                 <div className="flex leading-none">
                     <span className="text-[2rem] text-center font-semibold">Are you sure you want to save this form?</span>
                 </div>

@@ -59,7 +59,7 @@ export default function PerformanceRating() {
     const slimTableTheme = createTheme({
         table: {
             root: {
-                base: "divide-y divide-slate-200 overflow-hidden rounded-sm shadow-lg/20",
+                base: "divide-y divide-slate-200 overflow-hidden rounded-sm shadow-sm/10",
             },
             head: {
                 base: "text-xs uppercase tracking-wider",
@@ -70,7 +70,7 @@ export default function PerformanceRating() {
             body: {
                 base: "text-xs p-2 divide-y divide-slate-100 text-slate-400",
                 cell: {
-                    base: "py-[.3rem]",
+                    base: "py-[.4rem]",
                 }
             },
         },
@@ -91,105 +91,103 @@ export default function PerformanceRating() {
         <>
             <PerformanceRatingModal record={selected} />
             <MainLayout>
-                <div className="min-h-screen bg-slate-50">
-                    <div className="max-w-6xl mx-auto space-y-4">
-                        <div className="flex flex-wrap items-center justify-between gap-4">
-                            <div className="flex items-center gap-3">
-                                <img
-                                    src={userData.avatar}
-                                    alt="Avatar"
-                                    className="w-10 h-10 rounded-full"
-                                />
-                                <div>
-                                    <h1 className="text-xl font-semibold">{userData.name}</h1>
-                                    <p className="text-sm text-gray-500">{userData.email}</p>
-                                </div>
-                            </div>
-                            <TextInput
-                                placeholder="Search employee name..."
-                                value={search}
-                                onChange={(e) => {
-                                    setSearch(e.target.value);
-                                    setPage(1);
-                                }}
-                                className="w-60 p-0"
+                <div className="flex flex-col w-full h-full gap-4">
+                    <div className="flex flex-wrap items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                            <img
+                                src={userData.avatar}
+                                alt="Avatar"
+                                className="w-10 h-10 rounded-full"
                             />
+                            <div>
+                                <h1 className="text-xl font-semibold">{userData.name}</h1>
+                                <p className="text-sm text-gray-500">{userData.email}</p>
+                            </div>
                         </div>
+                        <TextInput
+                            placeholder="Search employee name..."
+                            value={search}
+                            onChange={(e) => {
+                                setSearch(e.target.value);
+                                setPage(1);
+                            }}
+                            className="w-60 p-0"
+                        />
+                    </div>
 
-                        {/* DataTable */}
-                        <ThemeProvider theme={slimTableTheme}>
-                            <Table hoverable striped>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableHeadCell>Employee</TableHeadCell>
-                                        <TableHeadCell>Position</TableHeadCell>
-                                        <TableHeadCell>Review Period</TableHeadCell>
-                                        <TableHeadCell>Final Rating</TableHeadCell>
-                                        <TableHeadCell>Adjectival</TableHeadCell>
-                                        <TableHeadCell>Created At</TableHeadCell>
-                                        <TableHeadCell>Action</TableHeadCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {currentPageData.length > 0 ? (
-                                        currentPageData.map((record, index) => (
-                                            <TableRow key={index} className="hover:bg-gray-100">
-                                                <TableCell>{record.employeeInfo.employeeName || "—"}</TableCell>
-                                                <TableCell>{record.employeeInfo.employeePosition || "—"}</TableCell>
-                                                <TableCell>{record.employeeInfo.reviewPeriod || "—"}</TableCell>
-                                                <TableCell>
-                                                    {record.finalPerformanceRating.toFixed(2)}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {adjectival(record.finalPerformanceRating)}
-                                                </TableCell>
-                                                <TableCell>{record.createdAt}</TableCell>
-                                                <TableCell>
-                                                    <button onClick={() => handleModal(record)} className="w-fit h-[1.3rem] px-2 rounded-sm bg-blue-400 capitalize font-semibold focus:ring-2 focus:ring-blue-600 ring-offset-1 hover:bg-blue-500 text-white cursor-pointer">
-                                                        <div className="flex items-center justify-center gap-1">
-                                                            <FaMagnifyingGlass className="text-[.6rem]" />
-                                                            <span className="">View</span>
-                                                        </div>
-                                                    </button>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))
-                                    ) : (
-                                        <TableRow>
-                                            <TableCell
-                                                colSpan={7}
-                                                className="text-center py-2 text-gray-500 font-bold"
-                                            >
-                                                No records found
+                    {/* DataTable */}
+                    <ThemeProvider theme={slimTableTheme}>
+                        <Table hoverable striped>
+                            <TableHead>
+                                <TableRow>
+                                    <TableHeadCell>Employee</TableHeadCell>
+                                    <TableHeadCell>Position</TableHeadCell>
+                                    <TableHeadCell>Review Period</TableHeadCell>
+                                    <TableHeadCell>Final Rating</TableHeadCell>
+                                    <TableHeadCell>Adjectival</TableHeadCell>
+                                    <TableHeadCell>Created At</TableHeadCell>
+                                    <TableHeadCell>Action</TableHeadCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {currentPageData.length > 0 ? (
+                                    currentPageData.map((record, index) => (
+                                        <TableRow key={index} className="hover:bg-gray-100">
+                                            <TableCell>{record.employeeInfo.employeeName || "—"}</TableCell>
+                                            <TableCell>{record.employeeInfo.employeePosition || "—"}</TableCell>
+                                            <TableCell>{record.employeeInfo.reviewPeriod || "—"}</TableCell>
+                                            <TableCell>
+                                                {record.finalPerformanceRating.toFixed(2)}
+                                            </TableCell>
+                                            <TableCell>
+                                                {adjectival(record.finalPerformanceRating)}
+                                            </TableCell>
+                                            <TableCell>{record.createdAt}</TableCell>
+                                            <TableCell>
+                                                <button onClick={() => handleModal(record)} className="w-fit h-[1.3rem] px-2 rounded-sm bg-blue-400 capitalize font-semibold focus:ring-2 focus:ring-blue-600 ring-offset-1 hover:bg-blue-500 text-white cursor-pointer">
+                                                    <div className="flex items-center justify-center gap-1">
+                                                        <FaMagnifyingGlass className="text-[.6rem]" />
+                                                        <span className="">View</span>
+                                                    </div>
+                                                </button>
                                             </TableCell>
                                         </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </ThemeProvider>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell
+                                            colSpan={7}
+                                            className="text-center py-2 text-gray-500 font-bold"
+                                        >
+                                            No records found
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </ThemeProvider>
 
-                        {/* Pagination */}
-                        <div className="flex flex-col md:flex-row items-center justify-between text-sm text-gray-600 leading-none">
-                            <p className="">
-                                Showing{" "}
-                                <span className="font-medium">
-                                    {filtered.length === 0 ? 0 : start + 1}
-                                </span>{" "}
-                                to{" "}
-                                <span className="font-medium">
-                                    {Math.min(start + perPage, filtered.length)}
-                                </span>{" "}
-                                of{" "}
-                                <span className="font-medium">{filtered.length}</span> entries
-                            </p>
-                            <div className="flex overflow-x-auto sm:justify-center">
-                                <Pagination
-                                    theme={paginationTheme}
-                                    currentPage={page}
-                                    totalPages={totalPages}
-                                    onPageChange={setPage}
-                                />
-                            </div>
+                    {/* Pagination */}
+                    <div className="flex flex-col md:flex-row items-center justify-between text-sm text-gray-600 leading-none">
+                        <p className="">
+                            Showing{" "}
+                            <span className="font-medium">
+                                {filtered.length === 0 ? 0 : start + 1}
+                            </span>{" "}
+                            to{" "}
+                            <span className="font-medium">
+                                {Math.min(start + perPage, filtered.length)}
+                            </span>{" "}
+                            of{" "}
+                            <span className="font-medium">{filtered.length}</span> entries
+                        </p>
+                        <div className="flex overflow-x-auto sm:justify-center">
+                            <Pagination
+                                theme={paginationTheme}
+                                currentPage={page}
+                                totalPages={totalPages}
+                                onPageChange={setPage}
+                            />
                         </div>
                     </div>
                 </div>

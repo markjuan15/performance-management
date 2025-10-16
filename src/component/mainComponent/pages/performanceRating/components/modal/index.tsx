@@ -20,9 +20,17 @@ interface Iprops {
 
 
 export default function PerformanceRatingModal({ record }: Iprops) {
-    const { employeeInfo, kraRows, coreCompetencies, leadershipCompetencies, developmentPlan, totals } = record;
 
     const { performanceRatingModal, togglePerformanceRatingModal } = useModalStates()
+    const { employeeInfo, kraRows, coreCompetencies, leadershipCompetencies, developmentPlan, totals } = record;
+
+    function getAdjectivalRating(score: number): string {
+        if (score >= 4.5) return "Outstanding";
+        if (score >= 3.5) return "Very Satisfactory";
+        if (score >= 2.5) return "Satisfactory";
+        if (score >= 1.5) return "Unsatisfactory";
+        return "Poor";
+    }
     return (
         <Modal state={performanceRatingModal} closeState={() => togglePerformanceRatingModal(performanceRatingModal)} title={"Job Description"}>
             <div className="flex flex-col gap-2 w-screen lg:w-[70rem] p-2">
@@ -39,8 +47,6 @@ export default function PerformanceRatingModal({ record }: Iprops) {
                         <p><strong>Bureau/Division:</strong> {employeeInfo?.bureauDivision || "—"}</p>
                     </div>
                 </div>
-
-                {/* 📋 KRA Section */}
                 <div className="bg-white p-4 rounded-lg border shadow-sm">
                     <h2 className="font-semibold text-lg mb-3">Part I: Key Result Areas (KRAs)</h2>
                     <Accordion alwaysOpen={false}>
@@ -86,11 +92,31 @@ export default function PerformanceRatingModal({ record }: Iprops) {
                     </div>
                 </div>
 
-                {/* 💪 Core Competencies */}
+                {/* 💪 Part II: Core and Leadership Competencies */}
                 <div className="bg-white p-4 rounded-lg border shadow-sm">
-                    <h2 className="font-semibold text-lg mb-3">Part II: Core Competencies</h2>
-                    <div className="grid md:grid-cols-3 gap-2 text-sm">
+                    <h2 className="font-semibold text-lg mb-3">Part II: Core and Leadership Competencies</h2>
+
+                    {/* 🧭 Core Competencies */}
+                    <h3 className="font-semibold text-md mb-2">Core Competencies</h3>
+                    <div className="grid md:grid-cols-3 gap-2 text-sm mb-4">
                         {Object.entries(coreCompetencies || {}).map(([key, val]: [any, any | number]) => {
+                            const label = key
+                                .replace(/([A-Z])/g, " $1")
+                                .replace(/^./, (s: any) => s.toUpperCase())
+                                .trim();
+
+                            return (
+                                <p key={key}>
+                                    <strong>{label}</strong>: {String(val)}
+                                </p>
+                            );
+                        })}
+                    </div>
+
+                    {/* 🧩 Leadership Competencies */}
+                    <h3 className="font-semibold text-md mb-2">Leadership Competencies</h3>
+                    <div className="grid md:grid-cols-3 gap-2 text-sm">
+                        {Object.entries(leadershipCompetencies || {}).map(([key, val]: [any, any | number]) => {
                             const label = key
                                 .replace(/([A-Z])/g, " $1")
                                 .replace(/^./, (s: any) => s.toUpperCase())
@@ -105,22 +131,47 @@ export default function PerformanceRatingModal({ record }: Iprops) {
                     </div>
                 </div>
 
-                {/* 🧭 Leadership Competencies */}
                 <div className="bg-white p-4 rounded-lg border shadow-sm">
-                    <h2 className="font-semibold text-lg mb-3">Part III: Leadership Competencies</h2>
-                    <div className="grid md:grid-cols-3 gap-2 text-sm">
-                        {Object.entries(developmentPlan || {}).map(([key, val]: [any, any | number]) => {
-                            const label = key
-                                .replace(/([A-Z])/g, " $1")
-                                .replace(/^./, (s: any) => s.toUpperCase())
-                                .trim();
+                    <h2 className="font-semibold text-lg mb-3">Part III: Summary of Ratings</h2>
+                    <Table className="text-sm">
+                        <TableHead>
+                            <TableRow>
+                                <TableHeadCell>Section</TableHeadCell>
+                                <TableHeadCell>Rating</TableHeadCell>
+                                <TableHeadCell>Weight</TableHeadCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            <TableRow>
+                                <TableCell>Part I — KRAs</TableCell>
+                                <TableCell>{totals?.overallRating?.toFixed(2) || "—"}</TableCell>
+                                <TableCell>70%</TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell>Part II — Core Competencies</TableCell>
+                                <TableCell>{record?.coreAverage?.toFixed(2) || "—"}</TableCell>
+                                <TableCell>20%</TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell>Part III — Leadership Competencies</TableCell>
+                                <TableCell>{record?.leadershipAverage?.toFixed(2) || "—"}</TableCell>
+                                <TableCell>10%</TableCell>
+                            </TableRow>
 
-                            return (
-                                <p key={key}>
-                                    <strong>{label}</strong>: {String(val)}
-                                </p>
-                            );
-                        })}
+                            <TableRow className="border-t font-semibold">
+                                <TableCell>Final Rating</TableCell>
+                                <TableCell>{record?.finalPerformanceRating?.toFixed(2) || "—"}</TableCell>
+                                <TableCell>100%</TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+
+                    {/* 🗒 Adjectival Rating */}
+                    <div className="mt-2 text-sm">
+                        <p>
+                            <strong>Adjectival Rating: </strong>
+                            {getAdjectivalRating(record?.finalPerformanceRating || 0)}
+                        </p>
                     </div>
                 </div>
 

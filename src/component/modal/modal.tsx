@@ -38,7 +38,7 @@ export default function Modal({ state, children, closeState, title }: Iprops) {
                                 <IoIosCloseCircle className="cursor-pointer transition duration-500 active:scale-50 text-3xl text-slate-600" />
                             </div>
                         </div>
-                        <div className="flex items-center justify-center overflow-auto w-full h-full lg:max-h-[35rem] min-h-[10rem] scrollbar-none">
+                        <div className="overflow-auto w-full h-full lg:max-h-[35rem] min-h-[10rem] scrollbar-none">
                             {children}
                         </div>
                     </motion.div>
