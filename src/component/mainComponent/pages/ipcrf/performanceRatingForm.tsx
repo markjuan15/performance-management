@@ -1,11 +1,8 @@
 import { IoIosArrowDown } from "react-icons/io";
 import { FaTrashCan, FaPlus } from 'react-icons/fa6';
 import MainLayout from "../../../../layout/main/mainLayout";
-// import Caption from "../../../table/caption";
-// import Table, { TableBody, TableBodyRow, TableHead, TableHeadRow, TD, TH } from "../../../table/table";
-// import { competencies, functionalCompetencies, ratingSummary } from "./components/tableData";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useSavePerformanceForm } from "../../../../hooks/getInfoHook";
 import session from "../../../../hooks/supabaseHook";
 import PerformanceRatingFormModal from "./components/modal";
@@ -81,6 +78,15 @@ export default function PerformanceRatingForm() {
         timeline: "",
         resources: "",
     })
+
+    // ✅ Validation Errors
+    const [errors, setErrors] = useState<any>({
+        employeeInfo: {},
+        kraRows: {},
+    });
+
+    const formRef = useRef<HTMLDivElement>(null);
+
     const updateKRA = (id: string, partial: Partial<KRAItem>) => {
         setKraRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...partial } : r)));
     }
@@ -124,37 +130,161 @@ export default function PerformanceRatingForm() {
     }, [totals, coreAverage, leadershipAverage])
 
     const { performanceRatingFormModal, togglePerformanceRatingFormModal } = useModalStates()
-    const handleSubmit = async () => {
-        const payload = [{
-            employeeInfo: {
-                employeeName,
-                employeePosition,
-                reviewPeriod,
-                phaseDate,
-                raterName,
-                raterPosition,
-                bureauDivision,
+
+    // ✅ Enhanced validation with field-level errors
+    const validateForm = () => {
+        let newErrors: any = { employeeInfo: {}, kraRows: {} };
+        let isValid = true;
+        let invalidKRAIds: string[] = [];
+        let firstInvalidField: HTMLElement | null = null;
+
+        const scrollToElement = (el: HTMLElement) =>
+            el.scrollIntoView({ behavior: "smooth", block: "center" });
+
+        // helper to set firstInvalidField once
+        const setFirstIfMissing = (el: HTMLElement | null) => {
+            if (!firstInvalidField && el) firstInvalidField = el;
+        };
+
+        // ---------- Employee info (use consistent name attributes on inputs) ----------
+        const employeeFieldMap: Array<{ key: string; selector: string }> = [
+            { key: "employeeName", selector: "input[name='employeeName']" },
+            { key: "employeePosition", selector: "input[name='employeePosition']" },
+            { key: "reviewPeriod", selector: "input[name='reviewPeriod']" },
+            { key: "phaseDate", selector: "input[name='phaseDate']" },
+            { key: "raterName", selector: "input[name='raterName']" },
+            { key: "raterPosition", selector: "input[name='raterPosition']" },
+            { key: "bureauDivision", selector: "input[name='bureauDivision']" },
+        ];
+
+        // values object to iterate easily
+        const employeeValues: any = {
+            employeeName,
+            employeePosition,
+            reviewPeriod,
+            phaseDate,
+            raterName,
+            raterPosition,
+            bureauDivision,
+        };
+
+        employeeFieldMap.forEach((f) => {
+            if (!employeeValues[f.key]) {
+                newErrors.employeeInfo[f.key] = "Required";
+                isValid = false;
+                const el = formRef.current?.querySelector(f.selector) as HTMLElement | null;
+                setFirstIfMissing(el);
+            }
+        });
+
+        // ---------- KRA validation ----------
+        const kraErrors: any = {};
+        kraRows.forEach((r) => {
+            const kErr: any = {};
+            if (!r.mfo) kErr.mfo = "Required";
+            if (!r.kra) kErr.kra = "Required";
+            if (!r.objective) kErr.objective = "Required";
+            if (!r.timeline) kErr.timeline = "Required";
+            if (!r.target) kErr.target = "Required";
+            if (!r.mov) kErr.mov = "Required";
+            if (r.weight <= 0) kErr.weight = "Invalid weight";
+
+            if (Object.keys(kErr).length) {
+                kraErrors[r.id] = kErr;
+                invalidKRAIds.push(r.id);
+                isValid = false;
+
+                // Find the *first actual invalid input* inside this KRA row:
+                if (!firstInvalidField) {
+                    const kraSection = document.getElementById(`kra-${r.id}`);
+                    if (kraSection) {
+                        // prefer the specific invalid field if possible
+                        const fieldOrder = ["mfo", "kra", "objective", "timeline", "weight", "target", "mov"];
+                        let invalidEl: HTMLElement | null = null;
+                        for (const fieldName of fieldOrder) {
+                            if (kErr[fieldName]) {
+                                // our Input/textarea/select must include a name attribute like `mfo-${r.id}` etc.
+                                const sel = `[name='${fieldName}-${r.id}']`;
+                                invalidEl = kraSection.querySelector(sel) as HTMLElement | null;
+                                if (invalidEl) break;
+                            }
+                        }
+                        // fallback to the first focusable element in the section
+                        if (!invalidEl) {
+                            invalidEl = kraSection.querySelector("input, textarea, select") as HTMLElement | null;
+                        }
+                        setFirstIfMissing(invalidEl || kraSection);
+                    }
+                }
+            }
+        });
+
+        if (totals.totalWeight <= 0) {
+            newErrors.totalWeight = "Total weight must be higher than 0%";
+            isValid = false;
+            // set a sensible firstInvalidField if not set (search for any weight input)
+            if (!firstInvalidField) {
+                const weightEl = formRef.current?.querySelector("input[name^='weight-']") as HTMLElement | null;
+                setFirstIfMissing(weightEl);
+            }
+        }
+
+        // expand invalid KRA rows
+        if (invalidKRAIds.length > 0) {
+            setKraRows((prev) =>
+                prev.map((r) => (invalidKRAIds.includes(r.id) ? { ...r, collapsed: false } : r))
+            );
+        }
+
+        setErrors({ ...newErrors, kraRows: kraErrors });
+
+        // scroll to first invalid element if found
+        setTimeout(() => {
+            if (firstInvalidField) scrollToElement(firstInvalidField);
+        }, 100);
+
+        return isValid;
+    };
+
+
+    const handleSaveClick = () => {
+        const valid = validateForm();
+        if (valid) togglePerformanceRatingFormModal(performanceRatingFormModal);
+    };
+
+    const handleConfirmSubmit = async () => {
+        const payload = [
+            {
+                employeeInfo: {
+                    employeeName,
+                    employeePosition,
+                    reviewPeriod,
+                    phaseDate,
+                    raterName,
+                    raterPosition,
+                    bureauDivision,
+                },
+                kraRows,
+                totals,
+                coreCompetencies,
+                coreAverage,
+                leadershipCompetencies,
+                leadershipAverage,
+                developmentPlan,
+                finalPerformanceRating,
             },
-            kraRows,
-            totals,
-            coreCompetencies,
-            coreAverage,
-            leadershipCompetencies,
-            leadershipAverage,
-            developmentPlan,
-            finalPerformanceRating,
-        }, {
-            googleId: session?.id
-        }];
-        togglePerformanceRatingFormModal(performanceRatingFormModal)
-        await mutate(JSON.stringify(payload))
-    }
+            { googleId: session?.id },
+        ];
+
+        await mutate(JSON.stringify(payload));
+        togglePerformanceRatingFormModal(performanceRatingFormModal);
+    };
 
     return (
         <>
-            <PerformanceRatingFormModal onCancel={() => togglePerformanceRatingFormModal(performanceRatingFormModal)} onConfirm={() => handleSubmit()} />
+            <PerformanceRatingFormModal onCancel={() => togglePerformanceRatingFormModal(performanceRatingFormModal)} onConfirm={handleConfirmSubmit} />
             <MainLayout>
-                <div className="min-h-screen">
+                <div ref={formRef} className="min-h-screen">
                     <div className="flex flex-col gap-4">
                         <header className="flex justify-center items-center flex-wrap">
                             <div>
@@ -165,15 +295,15 @@ export default function PerformanceRatingForm() {
                         <section className="bg-white rounded-lg shadow-md/20 border border-slate-100 p-4">
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div className="space-y-3">
-                                    <Input label="Name of Employee" value={employeeName} onChange={setEmployeeName} />
-                                    <Input label="Position" value={employeePosition} onChange={setEmployeePosition} />
-                                    <Input label="Review Period" value={reviewPeriod} onChange={setReviewPeriod} />
-                                    <Input label="Date of Phase III" type="date" value={phaseDate} onChange={setPhaseDate} />
+                                    <Input name="employeeName" label="Name of Employee" value={employeeName} onChange={setEmployeeName} error={errors.employeeInfo.employeeName} />
+                                    <Input name="employeePosition" label="Position" value={employeePosition} onChange={setEmployeePosition} error={errors.employeeInfo.employeePosition} />
+                                    <Input name="reviewPeriod" label="Review Period" value={reviewPeriod} onChange={setReviewPeriod} error={errors.employeeInfo.reviewPeriod} />
+                                    <Input name="phaseDate" label="Date of Phase III" type="date" value={phaseDate} onChange={setPhaseDate} error={errors.employeeInfo.phaseDate} />
                                 </div>
                                 <div className="space-y-3">
-                                    <Input label="Name of Rater" value={raterName} onChange={setRaterName} />
-                                    <Input label="Position" value={raterPosition} onChange={setRaterPosition} />
-                                    <Input label="Bureau/Center/Service/Division" value={bureauDivision} onChange={setBureauDivision} />
+                                    <Input name="raterName" label="Name of Rater" value={raterName} onChange={setRaterName} error={errors.employeeInfo.raterName} />
+                                    <Input name="raterPosition" label="Position" value={raterPosition} onChange={setRaterPosition} error={errors.employeeInfo.raterPosition} />
+                                    <Input name="bureauDivision" label="Bureau/Center/Service/Division" value={bureauDivision} onChange={setBureauDivision} error={errors.employeeInfo.bureauDivision} />
                                 </div>
                             </div>
                         </section>
@@ -206,17 +336,26 @@ export default function PerformanceRatingForm() {
                                                 <div className="transition-all duration-300 ease-in-out" style={{ maxHeight: r.collapsed ? 0 : expandedMaxH, }} >
                                                     <div className={`p-4 transition-opacity duration-300 ${r.collapsed ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
                                                         <div className="flex flex-col gap-3">
+
+
                                                             <div className="grid grid-cols-2 gap-2">
-                                                                <Input label="MFO" value={r.mfo} onChange={(v: any) => updateKRA(r.id, { mfo: v })} />
-                                                                <Input label="KRA" value={r.kra} onChange={(v: any) => updateKRA(r.id, { kra: v })} />
+                                                                <Input name={`mfo-${r.id}`} label="Major Final Output (MFO)" value={r.mfo} onChange={(v: any) => updateKRA(r.id, { mfo: v })} error={errors.kraRows?.[r.id]?.mfo} />
+                                                                <Input name={`kra-${r.id}`} label="KRA" value={r.kra} onChange={(v: any) => updateKRA(r.id, { kra: v })} error={errors.kraRows?.[r.id]?.kra} />
+                                                                {/* <Input label="MFO" value={r.mfo} onChange={(v: any) => updateKRA(r.id, { mfo: v })} />
+                                                                <Input label="KRA" value={r.kra} onChange={(v: any) => updateKRA(r.id, { kra: v })} /> */}
                                                             </div>
-                                                            <TeaxtArea label="Objective" value={r.objective} onChange={(v: any) => updateKRA(r.id, { objective: v })} />
+                                                            <TeaxtArea name={`objective-${r.id}`} label="Objective" value={r.objective} onChange={(v: any) => updateKRA(r.id, { objective: v })} error={errors.kraRows?.[r.id]?.objective} />
+                                                            {/* <TeaxtArea label="Objective" value={r.objective} onChange={(v: any) => updateKRA(r.id, { objective: v })} /> */}
                                                             <div className="grid grid-cols-2 gap-2">
-                                                                <Input label="Timeline" value={r.timeline} onChange={(v: any) => updateKRA(r.id, { timeline: v })} />
-                                                                <Input label="Weight (%)" type="number" value={r.weight} onChange={(v: any) => updateKRA(r.id, { weight: Number(v) })} />
+                                                                <Input name={`timeline-${r.id}`} label="Timeline" value={r.timeline} onChange={(v: any) => updateKRA(r.id, { timeline: v })} error={errors.kraRows?.[r.id]?.timeline} />
+                                                                <Input name={`weight-${r.id}`} label="Weight (%)" type="number" value={r.weight} onChange={(v: any) => updateKRA(r.id, { weight: Number(v) })} error={errors.kraRows?.[r.id]?.weight} />
+                                                                {/* <Input label="Timeline" value={r.timeline} onChange={(v: any) => updateKRA(r.id, { timeline: v })} />
+                                                                <Input label="Weight (%)" type="number" value={r.weight} onChange={(v: any) => updateKRA(r.id, { weight: Number(v) })} /> */}
                                                             </div>
-                                                            <Input label="Target" value={r.target} onChange={(v: any) => updateKRA(r.id, { target: v })} />
-                                                            <TeaxtArea label="MOV / Actual Result" value={r.mov} onChange={(v: any) => updateKRA(r.id, { mov: v })} />
+                                                            <Input name={`target-${r.id}`} label="Target" value={r.target} onChange={(v: any) => updateKRA(r.id, { target: v })} error={errors.kraRows?.[r.id]?.target} />
+                                                            <TeaxtArea name={`mov-${r.id}`} label="Means of Verification (MOV)" value={r.mov} onChange={(v: any) => updateKRA(r.id, { mov: v })} error={errors.kraRows?.[r.id]?.mov} />
+                                                            {/* <Input label="Target" value={r.target} onChange={(v: any) => updateKRA(r.id, { target: v })} />
+                                                            <TeaxtArea label="MOV / Actual Result" value={r.mov} onChange={(v: any) => updateKRA(r.id, { mov: v })} /> */}
                                                             <div className="grid grid-cols-3 gap-2">
                                                                 <SelectRating label="Q" value={r.q} onChange={(v: any) => updateKRA(r.id, { q: v })} />
                                                                 <SelectRating label="E" value={r.e} onChange={(v: any) => updateKRA(r.id, { e: v })} />
@@ -240,6 +379,9 @@ export default function PerformanceRatingForm() {
 
                                 <div className="text-sm text-gray-600">
                                     Total Weight: <strong>{totals.totalWeight}%</strong> | Overall Avg: <strong>{totals.overallRating.toFixed(2)}</strong> | Total Score: <strong>{totals.totalScore.toFixed(2)}</strong>
+                                    {errors.totalWeight && (
+                                        <p className="text-red-500 text-xs mt-2">{errors.totalWeight}</p>
+                                    )}
                                 </div>
                             </div>
                         </section>
@@ -306,7 +448,7 @@ export default function PerformanceRatingForm() {
                         </section>
 
                         <div className="flex justify-end">
-                            <button onClick={() => togglePerformanceRatingFormModal(performanceRatingFormModal)} className="bg-blue-600 text-white px-4 py-1 rounded shadow cursor-pointer">
+                            <button onClick={handleSaveClick} className="bg-blue-600 text-white px-4 py-1 rounded shadow cursor-pointer">
                                 Save
                             </button>
                         </div>
@@ -317,32 +459,35 @@ export default function PerformanceRatingForm() {
     );
 }
 
-function Input({ label, value, onChange, type = "text" }: any) {
+function Input({ label, value, onChange, type = "text", error, name }: any) {
     return (
-        <div className="relative w-full">
+        <div className="flex flex-col relative w-full">
             <label className="absolute -top-2 left-3 bg-white px-1 text-xs font-semibold text-slate-500">
                 {label}
             </label>
             <input
                 type={type}
+                name={name}
                 value={value} onChange={(e) => onChange(e.target.value)}
-                className="bg-transparent w-full border border-gray-400 text-gray-600 placeholder-gray-500 rounded-md px-3 py-1 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className={`bg-transparent w-full border ${error ? 'border-red-500' : 'border-gray-400'} text-gray-600 placeholder-gray-500 rounded-md px-3 py-1 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500`}
             />
+            {error && <p className="text-xs text-red-500">{error}</p>}
         </div>
     );
 }
 
-function TeaxtArea({ label, value, onChange }: any) {
+function TeaxtArea({ label, value, onChange, error }: any) {
     return (
-        <div className="relative w-full">
+        <div className="flex flex-col relative w-full">
             <label className="absolute -top-2 left-3 bg-white px-1 text-xs font-semibold text-slate-500">
                 {label}
             </label>
             <textarea
                 value={value} onChange={(e) => onChange(e.target.value)}
                 placeholder="Write your message here..."
-                className="w-full bg-transparent border border-gray-400 text-slate-500 placeholder-gray-500 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className={`w-full bg-transparent border ${error ? 'border-red-500' : 'border-gray-400'} border-gray-400 text-slate-500 placeholder-gray-500 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500`}
             ></textarea>
+            {error && <p className="text-xs text-red-500">{error}</p>}
         </div>
     );
 }
@@ -400,120 +545,3 @@ function CompetencyRow({ label, value, onChange }: any) {
         </div>
     );
 }
-
-
-// export default function PerformanceRatingForm() {
-
-//     return (
-//         <MainLayout>
-//             <div className="flex flex-col w-full">
-//                 <div className="flex items-center justify-center w-full p-2">
-//                     <span className="font-semibold uppercase">Performance Rating Form</span>
-//                 </div>
-//                 <div className="flex flex-col gap-4">
-//                     <div className="flex flex-col gap-2 p-4 rounded-md bg-slate-50">
-//                         <span className="text-sm font-normal">Employee Name:</span>
-//                         <span className="text-sm font-normal">Position:</span>
-//                         <span className="text-sm font-normal">Department:</span>
-//                         <span className="text-sm font-normal">Rating Period:</span>
-//                         <span className="text-sm font-normal">Rater:</span>
-//                     </div>
-//                     <Table>
-//                         <Caption>Core Competencies</Caption>
-//                         <TableHead>
-//                             <TableHeadRow>
-//                                 <TH>Competency</TH>
-//                                 <TH>Description</TH>
-//                                 <TH>Rating (1–5)</TH>
-//                             </TableHeadRow>
-//                         </TableHead>
-//                         <TableBody>
-//                             {competencies?.map((value: any, index: any) =>
-//                                 <TableBodyRow key={index}>
-//                                     <TD>{value.competency}</TD>
-//                                     <TD>{value.description}</TD>
-//                                     <TD>{value.rating}</TD>
-//                                 </TableBodyRow>
-//                             )}
-//                         </TableBody>
-//                     </Table>
-
-//                     <Table>
-//                         <Caption>Functional Competencies</Caption>
-//                         <TableHead>
-//                             <TableHeadRow>
-//                                 <TH>KRA</TH>
-//                                 <TH>Success Indicators</TH>
-//                                 <TH>Rating (1–5)</TH>
-//                             </TableHeadRow>
-//                         </TableHead>
-//                         <TableBody>
-//                             {functionalCompetencies.length > 0
-//                                 ? functionalCompetencies?.map((value: any, index: any) =>
-//                                     <TableBodyRow key={index}>
-//                                         <TD>{value.kra}</TD>
-//                                         <TD>{value.indicators}</TD>
-//                                         <TD>{value.rating}</TD>
-//                                     </TableBodyRow>
-//                                 ) : <TableBodyRow>
-//                                     <TD col={3}><span className="flex items-center justify-center">No data</span></TD>
-//                                 </TableBodyRow>
-//                             }
-//                         </TableBody>
-//                     </Table>
-
-//                     <Table>
-//                         <Caption>Final Rating Summary</Caption>
-//                         <TableHead>
-//                             <TableHeadRow>
-//                                 <TH>Compenent</TH>
-//                                 <TH>Weight</TH>
-//                                 <TH>Score (1–5)</TH>
-//                             </TableHeadRow>
-//                         </TableHead>
-//                         <TableBody>
-//                             {ratingSummary.length > 0
-//                                 ? ratingSummary?.map((value: any, index: any) =>
-//                                     <TableBodyRow key={index}>
-//                                         <TD>{value.component}</TD>
-//                                         <TD>{value.weight}</TD>
-//                                         <TD>{value.score}</TD>
-//                                     </TableBodyRow>
-//                                 ) : <TableBodyRow>
-//                                     <TD col={3}><span className="flex items-center justify-center">No data</span></TD>
-//                                 </TableBodyRow>
-//                             }
-//                         </TableBody>
-//                     </Table>
-
-//                     <div className="flex flex-col gap-2 p-4 rounded-md bg-slate-50">
-//                         <span className="font-semibold">Adjectival Rating:</span>
-//                         <span className="font-semibold">Adjectival Rating Scale</span>
-//                         <div className="flex flex-col w-[15rem]">
-//                             <div className="flex items-center justify-between">
-//                                 <span className="text-sm font-normal">Outstanding</span>
-//                                 <span className="text-sm font-normal">4.50 – 5.00</span>
-//                             </div>
-//                             <div className="flex items-center justify-between">
-//                                 <span className="text-sm font-normal">Very Satisfactory</span>
-//                                 <span className="text-sm font-normal">3.50 – 4.49</span>
-//                             </div>
-//                             <div className="flex items-center justify-between">
-//                                 <span className="text-sm font-normal">Satisfactory</span>
-//                                 <span className="text-sm font-normal">2.50 – 3.49</span>
-//                             </div>
-//                             <div className="flex items-center justify-between">
-//                                 <span className="text-sm font-normal">Unsatisfactory</span>
-//                                 <span className="text-sm font-normal">1.50 – 2.49</span>
-//                             </div>
-//                             <div className="flex items-center justify-between">
-//                                 <span className="text-sm font-normal">Poor</span>
-//                                 <span className="text-sm font-normal">1.00 – 1.49</span>
-//                             </div>
-//                         </div>
-//                     </div>
-//                 </div>
-//             </div>
-//         </MainLayout>
-//     )
-// }

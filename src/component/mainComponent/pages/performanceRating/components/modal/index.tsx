@@ -23,7 +23,7 @@ export default function PerformanceRatingModal({ record }: Iprops) {
 
     const { performanceRatingModal, togglePerformanceRatingModal } = useModalStates()
     const { employeeInfo, kraRows, coreCompetencies, leadershipCompetencies, developmentPlan, totals } = record;
-
+    console.log(totals)
     function getAdjectivalRating(score: number): string {
         if (score >= 4.5) return "Outstanding";
         if (score >= 3.5) return "Very Satisfactory";
@@ -50,7 +50,7 @@ export default function PerformanceRatingModal({ record }: Iprops) {
                 <div className="bg-white p-4 rounded-lg border shadow-sm">
                     <h2 className="font-semibold text-lg mb-3">Part I: Key Result Areas (KRAs)</h2>
                     <Accordion alwaysOpen={false}>
-                        {kraRows?.map((kra: any, idx: number) => (
+                        {totals?.rows?.map((kra: any, idx: number) => (
                             <AccordionPanel key={kra?.id}>
                                 <AccordionTitle>
                                     {`KRA ${idx + 1}`} – {kra?.kra || "Untitled"}
@@ -87,7 +87,8 @@ export default function PerformanceRatingModal({ record }: Iprops) {
                             </AccordionPanel>
                         ))}
                     </Accordion>
-                    <div className="mt-4 text-sm text-right">
+                    <div className="flex gap-2 justify-end w-full mt-4 text-sm">
+                        <p><strong>Total Score:</strong> {totals?.totalScore?.toFixed(2) || "—"}</p>
                         <p><strong>Overall Rating:</strong> {totals?.overallRating?.toFixed(2) || "—"}</p>
                     </div>
                 </div>
