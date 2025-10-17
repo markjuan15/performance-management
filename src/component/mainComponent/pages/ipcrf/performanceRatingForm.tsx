@@ -79,7 +79,6 @@ export default function PerformanceRatingForm() {
         resources: "",
     })
 
-    // ✅ Validation Errors
     const [errors, setErrors] = useState<any>({
         employeeInfo: {},
         kraRows: {},
@@ -131,7 +130,6 @@ export default function PerformanceRatingForm() {
 
     const { performanceRatingFormModal, togglePerformanceRatingFormModal } = useModalStates()
 
-    // ✅ Enhanced validation with field-level errors
     const validateForm = () => {
         let newErrors: any = { employeeInfo: {}, kraRows: {} };
         let isValid = true;
@@ -141,12 +139,10 @@ export default function PerformanceRatingForm() {
         const scrollToElement = (el: HTMLElement) =>
             el.scrollIntoView({ behavior: "smooth", block: "center" });
 
-        // helper to set firstInvalidField once
         const setFirstIfMissing = (el: HTMLElement | null) => {
             if (!firstInvalidField && el) firstInvalidField = el;
         };
 
-        // ---------- Employee info (use consistent name attributes on inputs) ----------
         const employeeFieldMap: Array<{ key: string; selector: string }> = [
             { key: "employeeName", selector: "input[name='employeeName']" },
             { key: "employeePosition", selector: "input[name='employeePosition']" },
@@ -157,7 +153,6 @@ export default function PerformanceRatingForm() {
             { key: "bureauDivision", selector: "input[name='bureauDivision']" },
         ];
 
-        // values object to iterate easily
         const employeeValues: any = {
             employeeName,
             employeePosition,
@@ -177,7 +172,6 @@ export default function PerformanceRatingForm() {
             }
         });
 
-        // ---------- KRA validation ----------
         const kraErrors: any = {};
         kraRows.forEach((r) => {
             const kErr: any = {};
@@ -194,22 +188,18 @@ export default function PerformanceRatingForm() {
                 invalidKRAIds.push(r.id);
                 isValid = false;
 
-                // Find the *first actual invalid input* inside this KRA row:
                 if (!firstInvalidField) {
                     const kraSection = document.getElementById(`kra-${r.id}`);
                     if (kraSection) {
-                        // prefer the specific invalid field if possible
                         const fieldOrder = ["mfo", "kra", "objective", "timeline", "weight", "target", "mov"];
                         let invalidEl: HTMLElement | null = null;
                         for (const fieldName of fieldOrder) {
                             if (kErr[fieldName]) {
-                                // our Input/textarea/select must include a name attribute like `mfo-${r.id}` etc.
                                 const sel = `[name='${fieldName}-${r.id}']`;
                                 invalidEl = kraSection.querySelector(sel) as HTMLElement | null;
                                 if (invalidEl) break;
                             }
                         }
-                        // fallback to the first focusable element in the section
                         if (!invalidEl) {
                             invalidEl = kraSection.querySelector("input, textarea, select") as HTMLElement | null;
                         }
@@ -222,14 +212,12 @@ export default function PerformanceRatingForm() {
         if (totals.totalWeight <= 0) {
             newErrors.totalWeight = "Total weight must be higher than 0%";
             isValid = false;
-            // set a sensible firstInvalidField if not set (search for any weight input)
             if (!firstInvalidField) {
                 const weightEl = formRef.current?.querySelector("input[name^='weight-']") as HTMLElement | null;
                 setFirstIfMissing(weightEl);
             }
         }
 
-        // expand invalid KRA rows
         if (invalidKRAIds.length > 0) {
             setKraRows((prev) =>
                 prev.map((r) => (invalidKRAIds.includes(r.id) ? { ...r, collapsed: false } : r))
@@ -238,7 +226,6 @@ export default function PerformanceRatingForm() {
 
         setErrors({ ...newErrors, kraRows: kraErrors });
 
-        // scroll to first invalid element if found
         setTimeout(() => {
             if (firstInvalidField) scrollToElement(firstInvalidField);
         }, 100);
@@ -336,26 +323,17 @@ export default function PerformanceRatingForm() {
                                                 <div className="transition-all duration-300 ease-in-out" style={{ maxHeight: r.collapsed ? 0 : expandedMaxH, }} >
                                                     <div className={`p-4 transition-opacity duration-300 ${r.collapsed ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
                                                         <div className="flex flex-col gap-3">
-
-
                                                             <div className="grid grid-cols-2 gap-2">
                                                                 <Input name={`mfo-${r.id}`} label="Major Final Output (MFO)" value={r.mfo} onChange={(v: any) => updateKRA(r.id, { mfo: v })} error={errors.kraRows?.[r.id]?.mfo} />
                                                                 <Input name={`kra-${r.id}`} label="KRA" value={r.kra} onChange={(v: any) => updateKRA(r.id, { kra: v })} error={errors.kraRows?.[r.id]?.kra} />
-                                                                {/* <Input label="MFO" value={r.mfo} onChange={(v: any) => updateKRA(r.id, { mfo: v })} />
-                                                                <Input label="KRA" value={r.kra} onChange={(v: any) => updateKRA(r.id, { kra: v })} /> */}
                                                             </div>
                                                             <TeaxtArea name={`objective-${r.id}`} label="Objective" value={r.objective} onChange={(v: any) => updateKRA(r.id, { objective: v })} error={errors.kraRows?.[r.id]?.objective} />
-                                                            {/* <TeaxtArea label="Objective" value={r.objective} onChange={(v: any) => updateKRA(r.id, { objective: v })} /> */}
                                                             <div className="grid grid-cols-2 gap-2">
                                                                 <Input name={`timeline-${r.id}`} label="Timeline" value={r.timeline} onChange={(v: any) => updateKRA(r.id, { timeline: v })} error={errors.kraRows?.[r.id]?.timeline} />
                                                                 <Input name={`weight-${r.id}`} label="Weight (%)" type="number" value={r.weight} onChange={(v: any) => updateKRA(r.id, { weight: Number(v) })} error={errors.kraRows?.[r.id]?.weight} />
-                                                                {/* <Input label="Timeline" value={r.timeline} onChange={(v: any) => updateKRA(r.id, { timeline: v })} />
-                                                                <Input label="Weight (%)" type="number" value={r.weight} onChange={(v: any) => updateKRA(r.id, { weight: Number(v) })} /> */}
                                                             </div>
                                                             <Input name={`target-${r.id}`} label="Target" value={r.target} onChange={(v: any) => updateKRA(r.id, { target: v })} error={errors.kraRows?.[r.id]?.target} />
                                                             <TeaxtArea name={`mov-${r.id}`} label="Means of Verification (MOV)" value={r.mov} onChange={(v: any) => updateKRA(r.id, { mov: v })} error={errors.kraRows?.[r.id]?.mov} />
-                                                            {/* <Input label="Target" value={r.target} onChange={(v: any) => updateKRA(r.id, { target: v })} />
-                                                            <TeaxtArea label="MOV / Actual Result" value={r.mov} onChange={(v: any) => updateKRA(r.id, { mov: v })} /> */}
                                                             <div className="grid grid-cols-3 gap-2">
                                                                 <SelectRating label="Q" value={r.q} onChange={(v: any) => updateKRA(r.id, { q: v })} />
                                                                 <SelectRating label="E" value={r.e} onChange={(v: any) => updateKRA(r.id, { e: v })} />
