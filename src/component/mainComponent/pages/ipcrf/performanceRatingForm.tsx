@@ -297,11 +297,11 @@ export default function PerformanceRatingForm() {
                         <section>
                             <h2 className="text-lg font-semibold mb-3">Part IV — Development Plan</h2>
                             <div className="bg-white rounded-lg shadow-md/20 border border-slate-100 p-4 grid md:grid-cols-2 gap-4">
-                                <TeaxtArea label="Strengths" value={developmentPlan.strengths} onChange={(e: any) => setDevelopmentPlan((s) => ({ ...s, strengths: e.target.value }))} className="p-2 border rounded h-24" />
-                                <TeaxtArea label="Development Needs" value={developmentPlan.needs} onChange={(e: any) => setDevelopmentPlan((s) => ({ ...s, needs: e.target.value }))} className="p-2 border rounded h-24" />
-                                <TeaxtArea label="Action Plan / Recommended Intervention" value={developmentPlan.actionPlan} onChange={(e: any) => setDevelopmentPlan((s) => ({ ...s, actionPlan: e.target.value }))} className="p-2 border rounded h-24 md:col-span-2" />
-                                <Input label="Timeline" value={developmentPlan.timeline} onChange={(v: any) => setDevelopmentPlan((s) => ({ ...s, timeline: v }))} />
-                                <Input label="Resources Needed" value={developmentPlan.resources} onChange={(v: any) => setDevelopmentPlan((s) => ({ ...s, resources: v }))} />
+                                <TeaxtArea2 label="Strengths" value={developmentPlan?.strengths} onChange={(e: any) => setDevelopmentPlan((s) => ({ ...s, strengths: e?.target?.value }))} className="p-2 border rounded h-24" />
+                                <TeaxtArea2 label="Development Needs" value={developmentPlan?.needs} onChange={(e: any) => setDevelopmentPlan((s) => ({ ...s, needs: e?.target?.value }))} className="p-2 border rounded h-24" />
+                                <TeaxtArea2 label="Action Plan / Recommended Intervention" value={developmentPlan?.actionPlan} onChange={(e: any) => setDevelopmentPlan((s) => ({ ...s, actionPlan: e?.target?.value }))} className="p-2 border rounded h-24 md:col-span-2" />
+                                <Input label="Timeline" value={developmentPlan?.timeline} onChange={(v: any) => setDevelopmentPlan((s) => ({ ...s, timeline: v }))} />
+                                <Input label="Resources Needed" value={developmentPlan?.resources} onChange={(v: any) => setDevelopmentPlan((s) => ({ ...s, resources: v }))} />
                             </div>
                         </section>
 
@@ -341,7 +341,22 @@ function TeaxtArea({ label, value, onChange }: any) {
             <textarea
                 value={value} onChange={(e) => onChange(e.target.value)}
                 placeholder="Write your message here..."
-                className="w-full bg-transparent border border-gray-400 text-gray-300 placeholder-gray-500 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full bg-transparent border border-gray-400 text-slate-500 placeholder-gray-500 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            ></textarea>
+        </div>
+    );
+}
+
+function TeaxtArea2({ label, value, onChange }: any) {
+    return (
+        <div className="relative w-full">
+            <label className="absolute -top-2 left-3 bg-white px-1 text-xs font-semibold text-slate-500">
+                {label}
+            </label>
+            <textarea
+                value={value} onChange={onChange}
+                placeholder="Write your message here..."
+                className="w-full bg-transparent border border-gray-400 text-slate-500 placeholder-gray-500 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
             ></textarea>
         </div>
     );
